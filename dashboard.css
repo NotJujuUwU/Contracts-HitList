@@ -1,6 +1,4 @@
-/* ========================= */
-/* HITMAN DASHBOARD STYLING  */
-/* ========================= */
+/* GENERAL */
 body.hitman-theme {
   margin: 0;
   display: flex;
@@ -41,7 +39,6 @@ body.hitman-theme {
   color: #ff0000;
 }
 
-/* Sidebar Menu */
 .sidebar ul {
   list-style: none;
   padding: 0;
@@ -68,10 +65,10 @@ body.hitman-theme {
   background: #222;
   color: #ff0000;
   font-weight: bold;
-  box-shadow: 0 0 6px rgba(255, 0, 0, 0.5);
+  box-shadow: 0 0 6px rgba(255,0,0,0.5);
 }
 
-/* Main Content */
+/* Main content */
 .main-content {
   flex-grow: 1;
   padding: 40px;
@@ -80,14 +77,12 @@ body.hitman-theme {
 
 .main-content h1 {
   color: #ff0000;
-  font-size: 2rem;
   text-shadow: 0 0 6px #ff0000;
 }
-
-.motto {
-  color: #ff4444;
-  margin-bottom: 30px;
-  font-style: italic;
+.motto { 
+  color: #ff4444; 
+  margin-bottom: 30px; 
+  font-style: italic; 
 }
 
 /* Shoutbox */
@@ -98,7 +93,6 @@ body.hitman-theme {
   border-radius: 5px;
   max-width: 600px;
 }
-
 #messages {
   height: 250px;
   overflow-y: auto;
@@ -110,7 +104,6 @@ body.hitman-theme {
   font-size: 0.9rem;
   color: #ccc;
 }
-
 #messageInput {
   width: 75%;
   padding: 8px;
@@ -118,22 +111,21 @@ body.hitman-theme {
   background: #222;
   color: #fff;
 }
-
 .shoutbox button {
   width: 20%;
   padding: 8px;
-  border: none;
   background: #ff0000;
   color: white;
+  border: none;
+  border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
-  border-radius: 4px;
 }
 .shoutbox button:hover {
   background: #cc0000;
 }
 
-/* Contracts + MyContracts + History */
+/* Contracts + Cards */
 .contract-btn {
   background: #ff0000;
   color: #fff;
@@ -142,24 +134,24 @@ body.hitman-theme {
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
-  margin-top: 10px;
 }
-.contract-btn:hover {
-  background: #cc0000;
-}
+.contract-btn:hover { background: #cc0000; }
 
 #contractForm {
   background: #111;
   border: 2px solid #ff0000;
-  border-radius: 5px;
+  border-radius: 8px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-top: 20px;
+  max-width: 500px;
 }
+
 #contractForm label {
   display: block;
   margin: 10px 0 5px;
   color: #ff4444;
 }
+
 #contractForm input,
 #contractForm textarea {
   width: 100%;
@@ -169,12 +161,31 @@ body.hitman-theme {
   border-radius: 4px;
   background: #222;
   color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 0.95rem;
+  box-sizing: border-box;
 }
+
 #contractForm textarea {
   min-height: 80px;
   resize: vertical;
 }
 
+#contractForm button {
+  margin-top: 10px;
+  padding: 10px;
+  background: #ff0000;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#contractForm button:hover {
+  background: #cc0000;
+}
+
+/* Boards */
 .contracts-board {
   margin-top: 20px;
   display: flex;
@@ -188,15 +199,8 @@ body.hitman-theme {
   border-radius: 6px;
 }
 .contract-card h3 {
-  margin: 0;
   color: #ff0000;
-}
-.contract-card p {
-  margin: 4px 0;
-}
-.contract-card span {
-  display: block;
-  margin-top: 4px;
+  margin-top: 0;
 }
 .contract-card button {
   margin-top: 10px;
@@ -211,11 +215,39 @@ body.hitman-theme {
   background: #cc0000;
 }
 
-/* History section muted style */
 #historyBoard .contract-card {
   border-color: #666;
   color: #aaa;
 }
 #historyBoard .contract-card h3 {
   color: #bbb;
+}
+
+/* Profile Card */
+.profile-card {
+  background: #111;
+  border: 2px solid #ff0000;
+  border-radius: 8px;
+  padding: 20px;
+  width: 320px;
+  text-align: center;
+}
+
+.profile-pic-large {
+  width: 120px;
+  height: 120px;
+  background: #333 url('images/agent.png') center/cover no-repeat;
+  border: 3px solid #ff0000;
+  border-radius: 50%;
+  margin: 0 auto 10px auto;
+}
+
+.profile-card h2 { 
+  color: #ff0000; 
+  margin-bottom: 10px; 
+}
+
+.profile-card p {
+  margin: 4px 0;
+  font-size: 0.95rem;
 }

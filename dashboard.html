@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Criminal Underworld Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="dashboard.css" />
 </head>
 <body class="hitman-theme">
   <!-- Sidebar -->
@@ -19,18 +19,17 @@
       <li onclick="showSection('contracts')">Contracts</li>
       <li onclick="showSection('myContracts')">My Contracts</li>
       <li onclick="showSection('history')">History</li>
+      <li onclick="showSection('profile')">Profile</li>
     </ul>
   </div>
 
-  <!-- Main Wrapper -->
+  <!-- Main Content -->
   <div class="main-content">
-
-    <!-- DASHBOARD SECTION -->
+    
+    <!-- DASHBOARD -->
     <div id="dashboard" class="section">
       <h1>Welcome to the Criminal Underworld</h1>
       <p class="motto">"Where contracts are signed in blood."</p>
-
-      <!-- Shoutbox -->
       <div class="shoutbox">
         <div id="messages"></div>
         <input type="text" id="messageInput" placeholder="Type your message...">
@@ -38,12 +37,11 @@
       </div>
     </div>
 
-    <!-- CONTRACTS SECTION -->
+    <!-- CONTRACTS -->
     <div id="contracts" class="section" style="display:none;">
       <h1>Contracts</h1>
       <button class="contract-btn" onclick="toggleContractForm()">Place Contract</button>
 
-      <!-- Place Contract Form -->
       <form id="contractForm" style="display:none; margin-top:20px;">
         <label>Full Name of Target</label>
         <input type="text" id="targetName" required>
@@ -63,25 +61,38 @@
         <button type="submit" class="contract-btn">Submit Contract</button>
       </form>
 
-      <!-- Public Contract Board -->
       <div id="contractsBoard" class="contracts-board"></div>
     </div>
 
-    <!-- MY CONTRACTS SECTION -->
+    <!-- MY CONTRACTS -->
     <div id="myContracts" class="section" style="display:none;">
       <h1>My Contracts</h1>
       <div id="myContractsBoard" class="contracts-board"></div>
     </div>
 
-    <!-- HISTORY SECTION -->
+    <!-- HISTORY -->
     <div id="history" class="section" style="display:none;">
       <h1>History</h1>
       <div id="historyBoard" class="contracts-board"></div>
     </div>
 
+    <!-- PROFILE (Expanded Stats) -->
+    <div id="profile" class="section" style="display:none;">
+      <h1>Agent Profile</h1>
+      <div class="profile-card">
+        <div class="profile-pic-large" id="profilePicLarge"></div>
+        <h2 id="profileName"></h2>
+
+        <p><b>Rank:</b> <span id="agentRank">Recruit</span></p>
+        <p><b>Contracts Completed:</b> <span id="completedCount">0</span></p>
+        <p><b>Contracts Failed:</b> <span id="failedCount">0</span></p>
+        <p><b>Total Earnings:</b> $<span id="earnings">0</span></p>
+        <p><b>Success Rate:</b> <span id="successRate">0%</span></p>
+        <p><b>Reputation:</b> <span id="repScore">0</span></p>
+      </div>
+    </div>
   </div>
 
-  <!-- Script -->
   <script src="dashboard.js"></script>
 </body>
 </html>
