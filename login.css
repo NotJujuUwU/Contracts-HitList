@@ -6,11 +6,11 @@ body.login-body {
   height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;  /* 👈 align to top vertically */
+  align-items: flex-start;  /* align to top vertically */
 }
 
 .login-container {
-  margin-top: 60px;   /* 👈 pushes card slightly down (adjust as needed) */
+  margin-top: 60px;   /* pushes card slightly down */
   background: #111;
   padding: 40px;
   border-radius: 8px;
@@ -28,13 +28,12 @@ body.login-body {
 .fib-logo { width: 70px; margin-right: 10px; }
 .login-container h1 { color: #FFD700; margin: 0; }
 
-/* Inputs */
-/* Labels above input */
+/* Labels */
 label {
   display: block;
   text-align: left;
   margin: 10px 0 5px;
-  color: #fff;   /* 👈 makes 'Agent ID' & 'Access Code' white */
+  color: #fff;
 }
 
 /* Input boxes */
@@ -44,14 +43,14 @@ input {
   margin-bottom: 15px;
   border: none;
   border-radius: 5px;
-  background: #222;   /* dark box background */
-  color: #fff;        /* 👈 makes typed text inside inputs white */
+  background: #222;
+  color: #fff;              /* typed text white */
   box-sizing: border-box;
 }
 
 /* Placeholder inside inputs */
 input::placeholder {
-  color: #ccc;        /* 👈 makes placeholders (Enter Agent ID…) light gray/white */
+  color: #ccc;              /* placeholder light gray */
 }
 
 /* Buttons row */
@@ -62,35 +61,40 @@ input::placeholder {
 }
 
 .login-btn, .signup-btn {
-  flex: 1;             /* 👈 each button gets equal width */
-  margin: 0 2px;       /* 👈 tiny space between them */
+  flex: 1;
+  margin: 0 2px;
   padding: 10px;
   border: none;
-  border-radius: 5px;  /* same radius as inputs */
+  border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
   box-sizing: border-box;
 }
 
-/* button colors */
 .login-btn { background:#FFD700; color:black; }
 .login-btn:hover { background:#ffea00; }
 .signup-btn { background:#333; color:#fff; }
 .signup-btn:hover { background:#555; }
 
-/* Hacker screen overlay still works */
+/* Hacker screen */
 .hacker-screen {
   display:none;
   background:black;
   color:#00ff00;
   font-family:"Courier New", monospace;
-  padding:20px;height:100vh;width:100vw;
-  white-space:pre-wrap;overflow-y:auto;
-  font-size:15px;text-shadow:0 0 8px #00ff00;
-  position:fixed;top:0;left:0;
+  padding:20px;
+  height:100vh;
+  width:100vw;
+  white-space:pre-wrap;
+  overflow-y:auto;
+  font-size:15px;
+  text-shadow:0 0 8px #00ff00;
+  position:fixed;
+  top:0;
+  left:0;
 }
 
-/* Shake animation for wrong login */
+/* Shake animation */
 @keyframes shake {
   0% { transform: translateX(0); }
   20% { transform: translateX(-8px); }
@@ -99,7 +103,6 @@ input::placeholder {
   80% { transform: translateX(6px); }
   100% { transform: translateX(0); }
 }
-
 .login-container.shake {
   animation: shake 0.4s ease;
 }
@@ -128,34 +131,9 @@ input::placeholder {
   font-weight: bold;
   cursor: pointer;
 }
-.info-btn:hover {
-  background: #555;
-}
+.info-btn:hover { background: #555; }
 
-/* Info popup modal */
-.info-popup {
-  display: none;
-  position: fixed;
-  bottom: 60px;
-  left: 15px;
-  width: 280px;
-  background: #111;
-  color: #eee;
-  border: 2px solid #ff0000;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 0.9rem;
-  box-shadow: 0 0 15px rgba(255,0,0,0.4);
-}
-.info-popup button {
-  margin-top: 10px;
-  background: #ff0000;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
+/* Info popup */
 .info-popup {
   display: none;
   position: fixed;
@@ -169,15 +147,15 @@ input::placeholder {
   padding: 15px;
   font-size: 0.9rem;
   box-shadow: 0 0 15px rgba(255,0,0,0.4);
-  text-align: left;           /* 👈 align text neatly */
-  line-height: 1.4;           /* 👈 improve readability */
+  text-align: left;
+  line-height: 1.4;
 }
 
 .info-popup h3 {
   margin-top: 0;
   margin-bottom: 8px;
   font-size: 1rem;
-  color: #ff4444;             /* 👈 red headline */
+  color: #ff4444;
   border-bottom: 1px solid #333;
   padding-bottom: 4px;
 }
@@ -196,9 +174,6 @@ input::placeholder {
   border-radius: 4px;
   cursor: pointer;
   display: block;
-  margin-left: auto; /* 👈 button floats to bottom-right inside box */
+  margin-left: auto;  /* button aligned right */
 }
-
-.info-popup button:hover {
-  background: #cc0000;
-}
+.info-popup button:hover { background: #cc0000; }

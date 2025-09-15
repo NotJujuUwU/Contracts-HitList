@@ -38,7 +38,8 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
           setTimeout(typeLine, 20); // typing speed
         } else {
           hackerScreen.textContent += "\n";
-          i++; charIndex = 0;
+          i++; 
+          charIndex = 0;
           setTimeout(typeLine, 120); // pause before next line
         }
       } else {
@@ -72,11 +73,13 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
   }
 });
 
+// ========================
+// INFO BUTTON POPUP
+// ========================
 function toggleInfo() {
   const popup = document.getElementById("infoPopup");
-  if (popup.style.display === "block") {
-    popup.style.display = "none";
-  } else {
-    popup.style.display = "block";
-  }
+  popup.style.display = (popup.style.display === "block") ? "none" : "block";
 }
+
+// 👇 Important: Expose globally so HTML inline onclick works
+window.toggleInfo = toggleInfo;

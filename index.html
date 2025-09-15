@@ -31,8 +31,6 @@
   <!-- Hacker Loading Screen -->
   <div class="hacker-screen" id="hackerScreen"></div>
 
-  <script src="login.js"></script>
-</body>
   <!-- Version label -->
   <div class="version-label">v0.01</div>
   
@@ -40,12 +38,17 @@
   <button class="info-btn" onclick="toggleInfo()">i</button>
   
   <!-- Info popup (hidden by default) -->
-<div class="info-popup" id="infoPopup">
-  <h3>ℹ️ Important Notice</h3>
-  <p>
-    This Website is for a <b>Roleplay (RP) server</b> only.<br>
-    It is purely a joke and entertainment purpose.<br>
-    <b>Do NOT take anything here seriously.</b>
-  </p>
-  <button onclick="toggleInfo()">Close</button>
-</div>
+  <div class="info-popup" id="infoPopup">
+    <h3>ℹ️ Important Notice</h3>
+    <p>
+      This Website is for a <b>Roleplay (RP) server</b> only.<br>
+      It is purely a joke and entertainment purpose.<br>
+      <b>Do NOT take anything here seriously.</b>
+    </p>
+    <button onclick="toggleInfo()">Close</button>
+  </div>
+
+  <!-- Script must stay last so it can "see" DOM elements -->
+  <script src="login.js"></script>
+</body>
+</html>
