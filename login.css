@@ -1,0 +1,92 @@
+/* Login body */
+body.login-body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;  /* 👈 align to top vertically */
+}
+
+.login-container {
+  margin-top: 60px;   /* 👈 pushes card slightly down (adjust as needed) */
+  background: #111;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(255,215,0,0.4);
+  width: 320px;
+  text-align: center;
+}
+
+.logo-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.fib-logo { width: 70px; margin-right: 10px; }
+.login-container h1 { color: #FFD700; margin: 0; }
+
+/* Inputs */
+label { display:block; text-align:left; margin:10px 0 5px; }
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 5px;
+  background: #222;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+/* Buttons row */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.login-btn, .signup-btn {
+  flex: 1;             /* 👈 each button gets equal width */
+  margin: 0 2px;       /* 👈 tiny space between them */
+  padding: 10px;
+  border: none;
+  border-radius: 5px;  /* same radius as inputs */
+  font-weight: bold;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* button colors */
+.login-btn { background:#FFD700; color:black; }
+.login-btn:hover { background:#ffea00; }
+.signup-btn { background:#333; color:#fff; }
+.signup-btn:hover { background:#555; }
+
+/* Hacker screen overlay still works */
+.hacker-screen {
+  display:none;
+  background:black;
+  color:#00ff00;
+  font-family:"Courier New", monospace;
+  padding:20px;height:100vh;width:100vw;
+  white-space:pre-wrap;overflow-y:auto;
+  font-size:15px;text-shadow:0 0 8px #00ff00;
+  position:fixed;top:0;left:0;
+}
+
+/* Shake animation for wrong login */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+.login-container.shake {
+  animation: shake 0.4s ease;
+}

@@ -1,0 +1,114 @@
+body.hitman-theme {
+  margin:0;display:flex;height:100vh;
+  font-family:Arial,sans-serif;background:#0a0a0a;color:#eee;
+}
+.sidebar {
+  background:#1a1a1a;min-width:220px;
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px 0;box-shadow:2px 0 10px rgba(255,0,0,0.4);
+}
+.profile { text-align:center;margin-bottom:30px; }
+.profile-pic {
+  width:100px;height:100px;background:#333;
+  border:2px solid #ff0000;border-radius:8px;
+  background-size:cover;background-position:center;
+  margin-bottom:10px;}
+.profile h3 {color:#ff0000;}
+.sidebar ul {list-style:none;padding:0;width:100%;display:flex;flex-direction:column;align-items:center;}
+.sidebar ul li {
+  width:80%;padding:10px;margin:6px 0;text-align:center;
+  border:1px solid #ff0000;border-radius:5px;background:#111;
+  cursor:pointer;transition:0.3s;}
+.sidebar ul li:hover, .sidebar ul li.active {background:#222;color:#ff0000;font-weight:bold;}
+
+.main-content {flex-grow:1;padding:40px;}
+.main-content h1 {color:#ff0000;font-size:2rem;text-shadow:0 0 6px #ff0000;}
+.motto {color:#ff4444;margin-bottom:30px;}
+
+.shoutbox {background:#111;border:2px solid #ff0000;padding:15px;border-radius:5px;max-width:600px;}
+#messages {height:250px;overflow-y:auto;margin-bottom:10px;padding:5px;
+  background:#0a0a0a;border:1px solid #333;font-family:monospace;font-size:0.9rem;color:#ccc;}
+#messageInput {width:75%;padding:8px;border:none;background:#222;color:#fff;}
+.shoutbox button {width:20%;padding:8px;border:none;background:#ff0000;color:white;font-weight:bold;cursor:pointer;}
+.shoutbox button:hover {background:#cc0000;}
+
+.contract-btn {
+  background:#ff0000;
+  color:#fff;
+  padding:10px;
+  border:none;
+  border-radius:5px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:10px;
+}
+.contract-btn:hover { background:#cc0000; }
+
+#contractForm {
+  background:#111;
+  border:2px solid #ff0000;
+  border-radius:5px;
+  padding:20px;
+}
+#contractForm label {
+  display:block;
+  margin:10px 0 5px;
+  color:#ff4444;
+}
+#contractForm input, #contractForm textarea {
+  width:100%;
+  padding:8px;
+  margin-bottom:12px;
+  border:none;
+  border-radius:4px;
+  background:#222;
+  color:#fff;
+}
+#contractForm textarea {
+  min-height:80px;
+  resize: vertical;
+}
+
+.contract-btn {
+  background:#ff0000;color:#fff;
+  padding:10px;border:none;border-radius:5px;
+  font-weight:bold;cursor:pointer;margin-top:10px;
+}
+.contract-btn:hover{background:#cc0000;}
+
+#contractForm {
+  background:#111;border:2px solid #ff0000;
+  border-radius:5px;padding:20px;margin-bottom:20px;
+}
+#contractForm label {
+  display:block;margin:10px 0 5px;color:#ff4444;
+}
+#contractForm input,#contractForm textarea {
+  width:100%;padding:8px;margin-bottom:12px;
+  border:none;border-radius:4px;background:#222;color:#fff;
+}
+#contractForm textarea{min-height:80px;resize:vertical;}
+
+/* Contract cards */
+.contracts-board {
+  margin-top:20px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+.contract-card {
+  background:#111;
+  border:2px solid #ff0000;
+  padding:15px;
+  border-radius:6px;
+}
+.contract-card h3 {margin:0;color:#ff0000;}
+.contract-card p{margin:4px 0;}
+.contract-card span{font-style:italic;color:#888;}
+.contract-card button {
+  margin-top:10px;
+  background:#ff0000;color:white;
+  padding:6px 12px;border:none;border-radius:4px;
+  cursor:pointer;
+}
+.contract-card button:hover{background:#cc0000;}

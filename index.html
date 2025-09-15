@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIB Secure Portal</title>
+  <link rel="stylesheet" href="login.css">
+</head>
+<body class="login-body">
+  <!-- Login Card -->
+  <div class="login-container">
+    <div class="logo-title">
+      <img src="images/fib-logo.png" alt="FIB Logo" class="fib-logo">
+      <h1>FIB</h1>
+    </div>
+
+    <form id="loginForm">
+      <label for="username">Agent ID</label>
+      <input type="text" id="username" placeholder="Enter Agent ID" required>
+
+      <label for="password">Access Code</label>
+      <input type="password" id="password" placeholder="Enter Access Code" required>
+
+      <div class="button-row">
+        <button type="button" class="signup-btn">Sign Up</button>
+        <button type="submit" class="login-btn">Login</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Hacker Loading Screen -->
+  <div class="hacker-screen" id="hackerScreen"></div>
+
+  <script src="login.js"></script>
+</body>
+</html>
