@@ -185,6 +185,75 @@ body.hitman-theme {
   background: #cc0000;
 }
 
+/* =======================
+   Custom Anonymous Toggle
+   ======================= */
+.anon-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  color: #ff4444;
+  font-size: 0.95rem;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+/* hide default checkbox */
+.anon-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+/* custom red box */
+.anon-toggle .checkmark {
+  height: 18px;
+  width: 18px;
+  background-color: #111;
+  border: 2px solid #ff0000;
+  border-radius: 3px;
+  display: inline-block;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* red fill when checked */
+.anon-toggle input:checked ~ .checkmark {
+  background-color: #ff0000;
+}
+
+/* tick setup */
+.anon-toggle .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.anon-toggle input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* ✅ aligned white tick */
+.anon-toggle .checkmark:after {
+  left: 4px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* nudge label text upward */
+.anon-toggle .label-text {
+  position: relative;
+  top: -1px;
+  line-height: 1.2;
+}
+
 /* Boards */
 .contracts-board {
   margin-top: 20px;

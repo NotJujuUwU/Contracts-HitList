@@ -73,6 +73,8 @@ window.toggleContractForm = toggleContractForm;
 document.getElementById("contractForm")?.addEventListener("submit", function (e) {
   e.preventDefault();
   const expiryHours = parseInt(document.getElementById("expiryHours").value) || 24;
+  const anonymous = document.getElementById("isAnonymous").checked;
+
   const contract = {
     id: Date.now(),
     target: document.getElementById("targetName").value,
@@ -84,7 +86,8 @@ document.getElementById("contractForm")?.addEventListener("submit", function (e)
     claimedBy: null,
     proofUrl: null,
     status: "Open",
-    expiresAt: Date.now() + (expiryHours * 60 * 60 * 1000)
+    expiresAt: Date.now() + (expiryHours * 60 * 60 * 1000),
+    anonymous: anonymous
   };
   contracts.push(contract);
   myContracts.push({ ...contract, tag: "Placed By Me" });
@@ -126,18 +129,20 @@ function renderContracts() {
   board.innerHTML="";
   contracts.forEach(c=>{
     if(c.status==="Paid"||c.status==="Completed"||c.claimedBy) return;
-    const hoursLeft = Math.floor((c.expiresAt - Date.now()) / 3600000);
-    const expired = hoursLeft < 0;
+    const hoursLeft=Math.floor((c.expiresAt - Date.now())/3600000);
+    const expired=hoursLeft < 0;
+    const placedBy = c.anonymous ? `<span class="anonymous">Anonymous</span>` : c.placedBy;
+
     board.innerHTML+=`
-      <div class="contract-card" id="contract-${c.id}">
+      <div class="contract-card">
         <h3>Target: ${c.target}</h3>
         <p>${c.description}</p>
         <p><b>Payment:</b> $${c.payment}</p>
         <p><b>Phone:</b> ${c.phone}</p>
-        <p class="expiration ${expired ? "expired" : ""}">
-          ${expired ? "❌ Expired" : `⏳ Expires in ${hoursLeft}h`}
+        <p class="expiration ${expired?"expired":""}">
+          ${expired? "❌ Expired" : `⏳ Expires in ${hoursLeft}h`}
         </p>
-        <span>Placed by: ${c.placedBy}</span><br>
+        <span>Placed by: ${placedBy}</span><br>
         <button onclick="showClaimForm(${c.id})">Claim Contract</button>
         <div id="claimForm-${c.id}" class="claim-form" style="display:none;">
           <label>Enter Your Bank Number</label>
@@ -178,7 +183,36 @@ function submitClaim(id) {
 window.submitClaim = submitClaim;
 
 // ========================
-// My Contracts + History
+// FAIL & EXPIRE ACTIONS
+// ========================
+function failContract(id) {
+  const c = contracts.find(ct => ct.id === id);
+  if (c && c.placedBy === username && c.claimedBy) {
+    c.status = "Failed";
+    if (!agents[c.claimedBy]) agents[c.claimedBy] = { completed:0, failed:0, earnings:0 };
+    agents[c.claimedBy].failed++;
+    history.push(c);
+    contracts=contracts.filter(ct=>ct.id!==id);
+    myContracts=myContracts.filter(ct=>ct.id!==id);
+    saveContracts(); renderContracts(); renderMyContracts(); renderHistory(); renderProfile();
+  }
+}
+window.failContract = failContract;
+
+function expireContract(id) {
+  const c = contracts.find(ct => ct.id === id);
+  if (c && c.placedBy === username) {
+    c.status = "Expired";
+    history.push(c);
+    contracts=contracts.filter(ct=>ct.id!==id);
+    myContracts=myContracts.filter(ct=>ct.id!==id);
+    saveContracts(); renderContracts(); renderMyContracts(); renderHistory(); renderProfile();
+  }
+}
+window.expireContract = expireContract;
+
+// ========================
+// Render My Contracts
 // ========================
 function renderMyContracts() {
   const board=document.getElementById("myContractsBoard"); if(!board) return;
@@ -187,9 +221,12 @@ function renderMyContracts() {
     if(c.status==="Paid") return;
     let extra="";
     if(c.placedBy===username && c.proofUrl && c.status==="Open"){
-      extra=`<button onclick="confirmProof(${c.id})">Confirm Proof</button>`;
+      extra=`
+        <button onclick="confirmProof(${c.id})">Confirm Proof</button>
+        <button style="background:#aa0000" onclick="failContract(${c.id})">Fail Contract</button>`;
     } else if(c.placedBy===username && c.status==="Completed"){
-      extra=`<button onclick="sendMoney(${c.id})">Money Sent</button>`;
+      extra=`<button onclick="sendMoney(${c.id})">Money Sent</button>
+              <button style="background:#aa0000" onclick="failContract(${c.id})">Fail Contract</button>`;
     } else if(c.claimedBy===username && c.status==="Open"){
       extra=`
         <button onclick="showProofForm(${c.id})">Send Proof</button>
@@ -199,6 +236,9 @@ function renderMyContracts() {
         </div>`;
     } else if(c.claimedBy===username && c.status==="Completed"){
       extra=`<span style="color:orange;">Awaiting Payment</span>`;
+    }
+    if(c.placedBy===username && (c.status==="Open" || c.status==="Completed")){
+      extra += `<button style="background:#555;margin-top:5px;" onclick="expireContract(${c.id})">Expire Contract</button>`;
     }
     const hoursLeft = Math.floor((c.expiresAt - Date.now()) / 3600000);
     board.innerHTML+=`
@@ -218,19 +258,17 @@ function renderMyContracts() {
   });
 }
 
-// ------------------------
-// CASEFILE STYLE HISTORY
-// ------------------------
+// ========================
+// Casefile History
+// ========================
 function renderHistory() {
   const board=document.getElementById("historyBoard"); if(!board) return;
   board.innerHTML="";
-
   history.forEach(c=>{
-    let statusClass = "", stampText = "";
-    if(c.status==="Failed") { statusClass="failed"; stampText="FAILED"; }
-    else if(c.status==="Expired") { statusClass="expired"; stampText="EXPIRED"; }
+    let statusClass="", stampText="";
+    if(c.status==="Failed"){ statusClass="failed"; stampText="FAILED"; }
+    else if(c.status==="Expired"){ statusClass="expired"; stampText="EXPIRED"; }
     else { statusClass="completed"; stampText="COMPLETED"; }
-
     board.innerHTML+=`
     <div class="casefile">
       <span class="stamp ${statusClass}">${stampText}</span>
@@ -238,11 +276,10 @@ function renderHistory() {
       <p><b>Description:</b> ${c.description}</p>
       <p><b>Payment:</b> $${c.payment}</p>
       <p><b>Phone:</b> ${c.phone}</p>
-      ${c.assassinBank ? `<p><b>Assassin's Bank:</b> ${c.assassinBank}</p>` : ""}
+      ${c.assassinBank?`<p><b>Assassin's Bank:</b> ${c.assassinBank}</p>`:""}
       <p><b>Placed by:</b> ${c.placedBy}</p>
       ${c.claimedBy?`<p><b>Claimed by:</b> ${c.claimedBy}</p>`:""}
-      ${c.proofUrl?`<div class="proof"><b>Proof Evidence:</b> <br>
-        <a href="${c.proofUrl}" target="_blank">${c.proofUrl}</a></div>`:""}
+      ${c.proofUrl?`<div class="proof"><b>Proof Evidence:</b> <a href="${c.proofUrl}" target="_blank">${c.proofUrl}</a></div>`:""}
     </div>`;
   });
 }
@@ -281,7 +318,7 @@ window.confirmProof=confirmProof;
 function sendMoney(id){
   const c=contracts.find(ct=>ct.id===id);
   if(c && c.placedBy===username && c.status==="Completed"){
-    c.status="Paid"; 
+    c.status="Paid";
     history.push(c);
     if(c.claimedBy){
       if(!agents[c.claimedBy]) agents[c.claimedBy] = {completed:0,failed:0,earnings:0};
@@ -301,7 +338,7 @@ window.sendMoney=sendMoney;
 function renderLeaderboard() {
   const board=document.getElementById("leaderboardBoard"); if(!board) return;
   board.innerHTML="";
-  const entries=Object.entries(agents).map(([name, stats])=>{
+  const entries=Object.entries(agents).map(([name,stats])=>{
     const rep=(stats.completed*2)-stats.failed;
     return { name, avatar:"images/agent.png", ...stats, rep };
   });

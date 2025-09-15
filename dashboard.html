@@ -58,9 +58,16 @@
         <label>Your In-Game Phone Number</label>
         <input type="text" id="phone" required>
 
-        <!-- New Expiry Field -->
+        <!-- Expiry Hours -->
         <label>Contract Expiration (hours)</label>
         <input type="number" id="expiryHours" min="1" value="24" required>
+
+        <!-- ✅ Custom Styled Anonymous Toggle -->
+        <label class="anon-toggle">
+          <input type="checkbox" id="isAnonymous">
+          <span class="checkmark"></span>
+          <span class="label-text">Place Contract Anonymously</span>
+        </label>
 
         <button type="submit" class="contract-btn">Submit Contract</button>
       </form>
