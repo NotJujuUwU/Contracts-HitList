@@ -6,6 +6,10 @@ function showSection(id) {
   document.getElementById(id).style.display = "block";
   document.querySelectorAll(".sidebar ul li").forEach(li => li.classList.remove("active"));
   event.target.classList.add("active");
+
+  if (id === "leaderboard") {
+    renderLeaderboard();
+  }
 }
 
 // ========================
@@ -20,7 +24,7 @@ if (!agents[username]) {
   agents[username] = { completed: 0, failed: 0, earnings: 0 };
 }
 
-function renderProfile(){
+function renderProfile() {
   const stats = agents[username];
   document.getElementById("profileName").textContent = username;
   document.getElementById("completedCount").textContent = stats.completed;
@@ -28,13 +32,12 @@ function renderProfile(){
   document.getElementById("earnings").textContent = stats.earnings;
 
   const total = stats.completed + stats.failed;
-  const success = total > 0 ? Math.round((stats.completed/total)*100) : 0;
+  const success = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
   document.getElementById("successRate").textContent = success + "%";
 
   const rep = (stats.completed * 2) - stats.failed;
   document.getElementById("repScore").textContent = rep;
 
-  // Ranks
   let rank = "Recruit";
   if (stats.completed >= 1 && stats.completed < 5) rank = "Enforcer";
   else if (stats.completed >= 5 && stats.completed < 10) rank = "Silent Assassin";
@@ -42,7 +45,6 @@ function renderProfile(){
   else if (stats.completed >= 20) rank = "The Bay Harbour Butcher";
 
   document.getElementById("agentRank").textContent = rank;
-
   localStorage.setItem("agents", JSON.stringify(agents));
 }
 
@@ -58,6 +60,7 @@ function saveContracts() {
   localStorage.setItem("myContracts", JSON.stringify(myContracts));
   localStorage.setItem("history", JSON.stringify(history));
   localStorage.setItem("agents", JSON.stringify(agents));
+  renderLeaderboard();
 }
 
 // ========================
@@ -69,7 +72,7 @@ function toggleContractForm() {
 }
 window.toggleContractForm = toggleContractForm;
 
-document.getElementById("contractForm")?.addEventListener("submit", function(e){
+document.getElementById("contractForm")?.addEventListener("submit", function (e) {
   e.preventDefault();
   const contract = {
     id: Date.now(),
@@ -77,7 +80,7 @@ document.getElementById("contractForm")?.addEventListener("submit", function(e){
     description: document.getElementById("targetDesc").value,
     payment: document.getElementById("payment").value,
     phone: document.getElementById("phone").value,
-    bank: document.getElementById("bank").value,
+    assassinBank: null, // set later when contract is claimed
     placedBy: username,
     claimedBy: null,
     proofUrl: null,
@@ -86,7 +89,7 @@ document.getElementById("contractForm")?.addEventListener("submit", function(e){
   contracts.push(contract);
   myContracts.push({ ...contract, tag: "Placed By Me" });
   saveContracts(); renderContracts(); renderMyContracts();
-  this.reset(); this.style.display="none";
+  this.reset(); this.style.display = "none";
 });
 
 // ========================
@@ -103,7 +106,6 @@ function renderContracts() {
         <p>${c.description}</p>
         <p><b>Payment:</b> $${c.payment}</p>
         <p><b>Phone:</b> ${c.phone}</p>
-        <p><b>Bank:</b> ${c.bank}</p>
         <span>Placed by: ${c.placedBy}</span><br>
         <button onclick="claimContract(${c.id})">Claim Contract</button>
       </div>`;
@@ -136,7 +138,7 @@ function renderMyContracts() {
         <p>${c.description}</p>
         <p><b>Payment:</b> $${c.payment}</p>
         <p><b>Phone:</b> ${c.phone}</p>
-        <p><b>Bank:</b> ${c.bank}</p>
+        ${c.assassinBank ? `<p><b>Assassin's Bank Details:</b> ${c.assassinBank}</p>` : ""}
         <span>${c.tag}</span><br>
         ${c.proofUrl?`<p><b>Proof:</b><a href="${c.proofUrl}" target="_blank">${c.proofUrl}</a></p>`:""}
         ${extra}
@@ -154,7 +156,7 @@ function renderHistory() {
       <p>${c.description}</p>
       <p><b>Payment:</b> $${c.payment}</p>
       <p><b>Phone:</b> ${c.phone}</p>
-      <p><b>Bank:</b> ${c.bank}</p>
+      ${c.assassinBank ? `<p><b>Assassin's Bank Details:</b> ${c.assassinBank}</p>` : ""}
       <span>Placed by: ${c.placedBy}</span><br>
       ${c.claimedBy?`<p><b>Claimed by:</b> ${c.claimedBy}</p>`:""}
       ${c.proofUrl?`<p><b>Proof:</b><a href="${c.proofUrl}" target="_blank">${c.proofUrl}</a></p>`:""}
@@ -169,7 +171,11 @@ function renderHistory() {
 function claimContract(id){
   const c=contracts.find(ct=>ct.id===id);
   if(c && !c.claimedBy){
+    const bankInput = prompt("Enter your in-game Bank Number to claim this contract:");
+    if (!bankInput) return; // don’t allow claim without bank
+
     c.claimedBy=username;
+    c.assassinBank=bankInput;
     myContracts=myContracts.filter(ct=>ct.id!==id);
     if(c.placedBy===username){ myContracts.push({...c,tag:"Placed By Me"}); }
     else { myContracts.push({...c,tag:"Claimed By Me"}); }
@@ -227,9 +233,58 @@ function sendMoney(id){
 window.sendMoney=sendMoney;
 
 // ========================
+// Leaderboard
+// ========================
+function renderLeaderboard() {
+  const board=document.getElementById("leaderboardBoard"); if(!board) return;
+  board.innerHTML="";
+
+  const entries=Object.entries(agents).map(([name, stats])=>{
+    const total=stats.completed+stats.failed;
+    const success= total>0 ? Math.round((stats.completed/total)*100) : 0;
+    const rep=(stats.completed*2)-stats.failed;
+    return {
+      name,
+      avatar:"images/agent.png",
+      completed:stats.completed,
+      failed:stats.failed,
+      earnings:stats.earnings,
+      success,
+      rep
+    };
+  });
+
+  entries.sort((a,b)=> b.completed - a.completed || b.rep - a.rep);
+
+  entries.forEach((agent,idx)=>{
+    const card=document.createElement("div");
+    card.classList.add("leaderboard-card");
+    if(idx===0) card.classList.add("rank-1");
+    if(idx===1) card.classList.add("rank-2");
+    if(idx===2) card.classList.add("rank-3");
+
+    card.innerHTML=`
+      <div class="agent-info">
+        <div class="avatar" style="background-image:url('${agent.avatar}')"></div>
+        <div>
+          <p><b>${idx+1}. ${agent.name}</b></p>
+          <p>✅ ${agent.completed} | ❌ ${agent.failed}</p>
+        </div>
+      </div>
+      <div>
+        <p>⭐ Rep: ${agent.rep}</p>
+        <p>💰 $${agent.earnings}</p>
+      </div>
+    `;
+    board.appendChild(card);
+  });
+}
+
+// ========================
 // INIT
 // ========================
 renderContracts(); 
 renderMyContracts(); 
 renderHistory(); 
-renderProfile();
+renderProfile(); 
+renderLeaderboard();
