@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="dashboard.css">
 </head>
 <body class="hitman-theme">
+  <!-- Sidebar -->
   <div class="sidebar">
     <div class="profile">
       <div class="profile-pic" id="profilePic"></div>
@@ -17,21 +18,19 @@
       <li class="active" onclick="showSection('dashboard')">Dashboard</li>
       <li onclick="showSection('contracts')">Contracts</li>
       <li onclick="showSection('myContracts')">My Contracts</li>
-      <li>Updating</li>
-      <li>Updating</li>
-      <li>Updating</li>
-      <li>Updating</li>
-      <li>Updating</li>
-      <li>Updating</li>
+      <li onclick="showSection('history')">History</li>
     </ul>
   </div>
 
+  <!-- Main Wrapper -->
   <div class="main-content">
+
     <!-- DASHBOARD SECTION -->
     <div id="dashboard" class="section">
       <h1>Welcome to the Criminal Underworld</h1>
       <p class="motto">"Where contracts are signed in blood."</p>
 
+      <!-- Shoutbox -->
       <div class="shoutbox">
         <div id="messages"></div>
         <input type="text" id="messageInput" placeholder="Type your message...">
@@ -44,7 +43,7 @@
       <h1>Contracts</h1>
       <button class="contract-btn" onclick="toggleContractForm()">Place Contract</button>
 
-      <!-- Form -->
+      <!-- Place Contract Form -->
       <form id="contractForm" style="display:none; margin-top:20px;">
         <label>Full Name of Target</label>
         <input type="text" id="targetName" required>
@@ -58,20 +57,31 @@
         <label>Your In-Game Phone Number</label>
         <input type="text" id="phone" required>
 
+        <label>Your In-Game Bank Number</label>
+        <input type="text" id="bank" required>
+
         <button type="submit" class="contract-btn">Submit Contract</button>
       </form>
 
-      <!-- Contract Board -->
+      <!-- Public Contract Board -->
       <div id="contractsBoard" class="contracts-board"></div>
     </div>
 
-    <!-- MY CONTRACTS -->
+    <!-- MY CONTRACTS SECTION -->
     <div id="myContracts" class="section" style="display:none;">
       <h1>My Contracts</h1>
       <div id="myContractsBoard" class="contracts-board"></div>
     </div>
+
+    <!-- HISTORY SECTION -->
+    <div id="history" class="section" style="display:none;">
+      <h1>History</h1>
+      <div id="historyBoard" class="contracts-board"></div>
+    </div>
+
   </div>
 
+  <!-- Script -->
   <script src="dashboard.js"></script>
 </body>
 </html>
