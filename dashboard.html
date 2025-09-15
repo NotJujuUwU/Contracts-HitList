@@ -58,6 +58,10 @@
         <label>Your In-Game Phone Number</label>
         <input type="text" id="phone" required>
 
+        <!-- New Expiry Field -->
+        <label>Contract Expiration (hours)</label>
+        <input type="number" id="expiryHours" min="1" value="24" required>
+
         <button type="submit" class="contract-btn">Submit Contract</button>
       </form>
 
@@ -73,7 +77,7 @@
     <!-- HISTORY -->
     <div id="history" class="section" style="display:none;">
       <h1>History</h1>
-      <div id="historyBoard" class="contracts-board"></div>
+      <div id="historyBoard" class="history-board"></div>
     </div>
 
     <!-- LEADERBOARD -->

@@ -7,9 +7,7 @@ function showSection(id) {
   document.querySelectorAll(".sidebar ul li").forEach(li => li.classList.remove("active"));
   event.target.classList.add("active");
 
-  if (id === "leaderboard") {
-    renderLeaderboard();
-  }
+  if (id === "leaderboard") renderLeaderboard();
 }
 
 // ========================
@@ -64,7 +62,7 @@ function saveContracts() {
 }
 
 // ========================
-// Contract Form
+// Contract Form Submit
 // ========================
 function toggleContractForm() {
   const form = document.getElementById("contractForm");
@@ -74,23 +72,51 @@ window.toggleContractForm = toggleContractForm;
 
 document.getElementById("contractForm")?.addEventListener("submit", function (e) {
   e.preventDefault();
+  const expiryHours = parseInt(document.getElementById("expiryHours").value) || 24;
   const contract = {
     id: Date.now(),
     target: document.getElementById("targetName").value,
     description: document.getElementById("targetDesc").value,
     payment: document.getElementById("payment").value,
     phone: document.getElementById("phone").value,
-    assassinBank: null, // set later when contract is claimed
+    assassinBank: null,
     placedBy: username,
     claimedBy: null,
     proofUrl: null,
-    status: "Open"
+    status: "Open",
+    expiresAt: Date.now() + (expiryHours * 60 * 60 * 1000)
   };
   contracts.push(contract);
   myContracts.push({ ...contract, tag: "Placed By Me" });
   saveContracts(); renderContracts(); renderMyContracts();
   this.reset(); this.style.display = "none";
 });
+
+// ========================
+// Expiration Check
+// ========================
+function checkExpiredContracts() {
+  const now = Date.now();
+  const expired = contracts.filter(c => c.expiresAt && c.expiresAt < now && c.status === "Open");
+  expired.forEach(c => {
+    if (c.claimedBy) {
+      if (!agents[c.claimedBy]) agents[c.claimedBy] = { completed: 0, failed: 0, earnings: 0 };
+      agents[c.claimedBy].failed++;
+      c.status = "Failed";
+      history.push(c);
+    } else {
+      c.status = "Expired";
+      history.push(c);
+    }
+  });
+
+  contracts = contracts.filter(c => !(c.status === "Failed" || c.status === "Expired"));
+  myContracts = myContracts.filter(c => !(c.status === "Failed" || c.status === "Expired"));
+  saveContracts();
+  renderContracts(); renderMyContracts(); renderHistory(); renderProfile();
+}
+setInterval(checkExpiredContracts, 60000);
+checkExpiredContracts();
 
 // ========================
 // Render Contracts
@@ -100,18 +126,60 @@ function renderContracts() {
   board.innerHTML="";
   contracts.forEach(c=>{
     if(c.status==="Paid"||c.status==="Completed"||c.claimedBy) return;
+    const hoursLeft = Math.floor((c.expiresAt - Date.now()) / 3600000);
+    const expired = hoursLeft < 0;
     board.innerHTML+=`
-      <div class="contract-card">
+      <div class="contract-card" id="contract-${c.id}">
         <h3>Target: ${c.target}</h3>
         <p>${c.description}</p>
         <p><b>Payment:</b> $${c.payment}</p>
         <p><b>Phone:</b> ${c.phone}</p>
+        <p class="expiration ${expired ? "expired" : ""}">
+          ${expired ? "❌ Expired" : `⏳ Expires in ${hoursLeft}h`}
+        </p>
         <span>Placed by: ${c.placedBy}</span><br>
-        <button onclick="claimContract(${c.id})">Claim Contract</button>
+        <button onclick="showClaimForm(${c.id})">Claim Contract</button>
+        <div id="claimForm-${c.id}" class="claim-form" style="display:none;">
+          <label>Enter Your Bank Number</label>
+          <input type="text" id="claimBank-${c.id}" placeholder="Bank #">
+          <button onclick="submitClaim(${c.id})">Confirm Claim</button>
+        </div>
       </div>`;
   });
 }
 
+// ========================
+// Inline Claim Process
+// ========================
+function showClaimForm(id) {
+  document.getElementById(`claimForm-${id}`).style.display = "block";
+}
+window.showClaimForm = showClaimForm;
+
+function submitClaim(id) {
+  const c = contracts.find(ct => ct.id === id);
+  const bankField = document.getElementById(`claimBank-${id}`);
+  const bankNum = bankField.value.trim();
+  if (!bankNum) return alert("You must enter your bank number to claim.");
+
+  if (c && !c.claimedBy) {
+    c.claimedBy = username;
+    c.assassinBank = bankNum;
+    myContracts = myContracts.filter(ct => ct.id !== id);
+    if (c.placedBy === username) {
+      myContracts.push({ ...c, tag: "Placed By Me" });
+    } else {
+      myContracts.push({ ...c, tag: "Claimed By Me" });
+    }
+    saveContracts();
+  }
+  renderContracts(); renderMyContracts();
+}
+window.submitClaim = submitClaim;
+
+// ========================
+// My Contracts + History
+// ========================
 function renderMyContracts() {
   const board=document.getElementById("myContractsBoard"); if(!board) return;
   board.innerHTML="";
@@ -132,6 +200,7 @@ function renderMyContracts() {
     } else if(c.claimedBy===username && c.status==="Completed"){
       extra=`<span style="color:orange;">Awaiting Payment</span>`;
     }
+    const hoursLeft = Math.floor((c.expiresAt - Date.now()) / 3600000);
     board.innerHTML+=`
       <div class="contract-card">
         <h3>Target: ${c.target}</h3>
@@ -139,6 +208,9 @@ function renderMyContracts() {
         <p><b>Payment:</b> $${c.payment}</p>
         <p><b>Phone:</b> ${c.phone}</p>
         ${c.assassinBank ? `<p><b>Assassin's Bank Details:</b> ${c.assassinBank}</p>` : ""}
+        <p class="expiration ${hoursLeft<0 ?"expired":""}">
+          ${hoursLeft<0?"❌ Expired":`⏳ Expires in ${hoursLeft}h`}
+        </p>
         <span>${c.tag}</span><br>
         ${c.proofUrl?`<p><b>Proof:</b><a href="${c.proofUrl}" target="_blank">${c.proofUrl}</a></p>`:""}
         ${extra}
@@ -146,45 +218,38 @@ function renderMyContracts() {
   });
 }
 
+// ------------------------
+// CASEFILE STYLE HISTORY
+// ------------------------
 function renderHistory() {
   const board=document.getElementById("historyBoard"); if(!board) return;
   board.innerHTML="";
+
   history.forEach(c=>{
+    let statusClass = "", stampText = "";
+    if(c.status==="Failed") { statusClass="failed"; stampText="FAILED"; }
+    else if(c.status==="Expired") { statusClass="expired"; stampText="EXPIRED"; }
+    else { statusClass="completed"; stampText="COMPLETED"; }
+
     board.innerHTML+=`
-    <div class="contract-card">
+    <div class="casefile">
+      <span class="stamp ${statusClass}">${stampText}</span>
       <h3>Target: ${c.target}</h3>
-      <p>${c.description}</p>
+      <p><b>Description:</b> ${c.description}</p>
       <p><b>Payment:</b> $${c.payment}</p>
       <p><b>Phone:</b> ${c.phone}</p>
-      ${c.assassinBank ? `<p><b>Assassin's Bank Details:</b> ${c.assassinBank}</p>` : ""}
-      <span>Placed by: ${c.placedBy}</span><br>
+      ${c.assassinBank ? `<p><b>Assassin's Bank:</b> ${c.assassinBank}</p>` : ""}
+      <p><b>Placed by:</b> ${c.placedBy}</p>
       ${c.claimedBy?`<p><b>Claimed by:</b> ${c.claimedBy}</p>`:""}
-      ${c.proofUrl?`<p><b>Proof:</b><a href="${c.proofUrl}" target="_blank">${c.proofUrl}</a></p>`:""}
-      <p style="color:lime;">✅ Contract Closed & Archived</p>
+      ${c.proofUrl?`<div class="proof"><b>Proof Evidence:</b> <br>
+        <a href="${c.proofUrl}" target="_blank">${c.proofUrl}</a></div>`:""}
     </div>`;
   });
 }
 
 // ========================
-// Actions
+// Proof / Confirm / Payment
 // ========================
-function claimContract(id){
-  const c=contracts.find(ct=>ct.id===id);
-  if(c && !c.claimedBy){
-    const bankInput = prompt("Enter your in-game Bank Number to claim this contract:");
-    if (!bankInput) return; // don’t allow claim without bank
-
-    c.claimedBy=username;
-    c.assassinBank=bankInput;
-    myContracts=myContracts.filter(ct=>ct.id!==id);
-    if(c.placedBy===username){ myContracts.push({...c,tag:"Placed By Me"}); }
-    else { myContracts.push({...c,tag:"Claimed By Me"}); }
-    saveContracts();
-  }
-  renderContracts(); renderMyContracts();
-}
-window.claimContract=claimContract;
-
 function showProofForm(id){ document.getElementById(`proofForm-${id}`).style.display="block"; }
 window.showProofForm=showProofForm;
 
@@ -218,13 +283,11 @@ function sendMoney(id){
   if(c && c.placedBy===username && c.status==="Completed"){
     c.status="Paid"; 
     history.push(c);
-
     if(c.claimedBy){
       if(!agents[c.claimedBy]) agents[c.claimedBy] = {completed:0,failed:0,earnings:0};
       agents[c.claimedBy].completed++;
       agents[c.claimedBy].earnings += parseInt(c.payment);
     }
-
     contracts=contracts.filter(ct=>ct.id!==id);
     myContracts=myContracts.filter(ct=>ct.id!==id);
     saveContracts(); renderContracts(); renderMyContracts(); renderHistory(); renderProfile();
@@ -238,31 +301,17 @@ window.sendMoney=sendMoney;
 function renderLeaderboard() {
   const board=document.getElementById("leaderboardBoard"); if(!board) return;
   board.innerHTML="";
-
   const entries=Object.entries(agents).map(([name, stats])=>{
-    const total=stats.completed+stats.failed;
-    const success= total>0 ? Math.round((stats.completed/total)*100) : 0;
     const rep=(stats.completed*2)-stats.failed;
-    return {
-      name,
-      avatar:"images/agent.png",
-      completed:stats.completed,
-      failed:stats.failed,
-      earnings:stats.earnings,
-      success,
-      rep
-    };
+    return { name, avatar:"images/agent.png", ...stats, rep };
   });
-
   entries.sort((a,b)=> b.completed - a.completed || b.rep - a.rep);
-
   entries.forEach((agent,idx)=>{
     const card=document.createElement("div");
     card.classList.add("leaderboard-card");
     if(idx===0) card.classList.add("rank-1");
     if(idx===1) card.classList.add("rank-2");
     if(idx===2) card.classList.add("rank-3");
-
     card.innerHTML=`
       <div class="agent-info">
         <div class="avatar" style="background-image:url('${agent.avatar}')"></div>
@@ -283,8 +332,8 @@ function renderLeaderboard() {
 // ========================
 // INIT
 // ========================
-renderContracts(); 
-renderMyContracts(); 
-renderHistory(); 
-renderProfile(); 
+renderContracts();
+renderMyContracts();
+renderHistory();
+renderProfile();
 renderLeaderboard();
