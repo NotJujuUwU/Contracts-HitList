@@ -21,7 +21,7 @@ body.hitman-theme {
 
 .profile {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 10px;  /* ⬅ lowered from 30px to bring buttons UP */
 }
 
 .profile-pic {
@@ -32,16 +32,18 @@ body.hitman-theme {
   border-radius: 8px;
   background-size: cover;
   background-position: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;   /* tightened gap under profile image */
 }
 
 .profile h3 {
   color: #ff0000;
+  margin-bottom: 5px;
 }
 
 .sidebar ul {
   list-style: none;
   padding: 0;
+  margin-top: 0;   /* no extra vertical gap */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -51,7 +53,7 @@ body.hitman-theme {
 .sidebar ul li {
   width: 80%;
   padding: 10px;
-  margin: 6px 0;
+  margin: 4px 0;   /* smaller margin between buttons */
   text-align: center;
   border: 1px solid #ff0000;
   border-radius: 5px;
@@ -67,6 +69,33 @@ body.hitman-theme {
   font-weight: bold;
   box-shadow: 0 0 6px rgba(255,0,0,0.5);
 }
+
+/* Main content */
+.main-content {
+  flex-grow: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.main-content h1 {
+  color: #ff0000;
+  text-shadow: 0 0 6px #ff0000;
+}
+.motto { 
+  color: #ff4444; 
+  margin-bottom: 30px; 
+  font-style: italic; 
+}
+
+/* Shoutbox */
+.shoutbox {
+  background: #111;
+  border: 2px solid #ff0000;
+  padding: 15px;
+  border-radius: 5px;
+  max-width: 600px;
+}
+/* ... (all other CSS remains unchanged from your previous version, including contracts, profile, stars, leaderboard, etc.) */
 
 /* Main content */
 .main-content {
@@ -129,20 +158,26 @@ body.hitman-theme {
 .contract-btn {
   background: #ff0000;
   color: #fff;
-  padding: 10px;
+  padding: 10px 14px;
   border: none;
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
+  margin-bottom: 15px; /* brings bottom spacing consistent with shoutbox title */
+  display: inline-block;
 }
 .contract-btn:hover { background: #cc0000; }
+
+#contracts .contract-btn {
+  margin-top: 0; /* place at very top under the h1 */
+}
 
 #contractForm {
   background: #111;
   border: 2px solid #ff0000;
   border-radius: 8px;
-  padding: 20px;
-  margin-top: 20px;
+  padding: 15px;
+  margin-top: 10px;
   max-width: 500px;
 }
 
@@ -173,7 +208,7 @@ body.hitman-theme {
 
 #contractForm button {
   margin-top: 10px;
-  padding: 10px;
+  padding: 10px 14px;
   background: #ff0000;
   color: white;
   font-weight: bold;
@@ -344,6 +379,20 @@ body.hitman-theme {
   color: #ff0000; 
   margin-bottom: 10px; 
 }
+
+/* ⭐ Rank Stars */
+.rank-stars {
+  margin: 8px 0 12px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+.rank-stars .rank-star {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
 .profile-card p {
   margin: 4px 0;
   font-size: 0.95rem;

@@ -37,12 +37,25 @@ function renderProfile() {
   document.getElementById("repScore").textContent = rep;
 
   let rank = "Recruit";
-  if (stats.completed >= 1 && stats.completed < 5) rank = "Enforcer";
-  else if (stats.completed >= 5 && stats.completed < 10) rank = "Silent Assassin";
-  else if (stats.completed >= 10 && stats.completed < 20) rank = "Master Hitman";
-  else if (stats.completed >= 20) rank = "The Bay Harbour Butcher";
+  let starCount = 1;
+  if (stats.completed >= 1 && stats.completed < 5) { rank = "Enforcer"; starCount = 2; }
+  else if (stats.completed >= 5 && stats.completed < 10) { rank = "Silent Assassin"; starCount = 3; }
+  else if (stats.completed >= 10 && stats.completed < 20) { rank = "Master Hitman"; starCount = 4; }
+  else if (stats.completed >= 20) { rank = "The Bay Harbour Butcher"; starCount = 5; }
 
   document.getElementById("agentRank").textContent = rank;
+
+  // ⭐ Add stars dynamically
+  const starContainer = document.getElementById("rankStars");
+  starContainer.innerHTML = "";
+  for (let i = 0; i < starCount; i++) {
+    const starImg = document.createElement("img");
+    starImg.src = "images/star.png";
+    starImg.alt = "star";
+    starImg.classList.add("rank-star");
+    starContainer.appendChild(starImg);
+  }
+
   localStorage.setItem("agents", JSON.stringify(agents));
 }
 

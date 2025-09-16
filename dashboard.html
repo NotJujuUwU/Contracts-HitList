@@ -45,7 +45,7 @@
       <h1>Contracts</h1>
       <button class="contract-btn" onclick="toggleContractForm()">Place Contract</button>
 
-      <form id="contractForm" style="display:none; margin-top:20px;">
+      <form id="contractForm" style="display:none;">
         <label>Full Name of Target</label>
         <input type="text" id="targetName" required>
 
@@ -100,6 +100,9 @@
       <div class="profile-card">
         <div class="profile-pic-large" id="profilePicLarge"></div>
         <h2 id="profileName">Agent</h2>
+
+        <!-- ⭐ Star container here -->
+        <div id="rankStars" class="rank-stars"></div>
 
         <p><b>Rank:</b> <span id="agentRank">Recruit</span></p>
         <p><b>Contracts Completed:</b> <span id="completedCount">0</span></p>
