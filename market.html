@@ -2,38 +2,149 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Marketplace</title>
+  <title>Global Marketplace</title>
   <link rel="stylesheet" href="game.css">
   <script src="items.js"></script>
+  <style>
+    /* --- Global Consistency --- */
+    body, .store-main {
+      background: #121212; /* unified dark backdrop */
+      color: #eee;
+      min-height: 100vh;
+    }
+
+    /* --- Marketplace Layout --- */
+    .market-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    /* Left Sidebar Controls */
+    .market-side {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .market-side h2 {
+      font-size: 1rem;
+      margin: 12px 0 8px;
+      color: #ffd700;
+      text-align: center;
+    }
+    .market-side select,
+    .market-side input,
+    .market-side button {
+      width: 90%;
+      margin-bottom: 10px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    .market-side input[type="number"] {
+      max-width: 120px;
+      text-align: center;
+    }
+    .market-side select {
+      max-width: 200px;
+    }
+    .market-side button {
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Right Market Panel */
+    .market-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .market-main h2 {
+      margin-bottom: 10px;
+    }
+    .market-listings {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 160px);
+      gap: 18px;
+      justify-content: center;
+      width: 100%;
+    }
+    .item-card {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 10px;
+      width: 160px;
+      font-size: 0.85rem;
+    }
+    .item-pic {
+      display: block;
+      margin: 0 auto 6px auto; /* center image */
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+    }
+    .item-card h3,
+    .item-card p {
+      text-align: left !important; /* force left text */
+      width: 100%;
+    }
+    .item-card button {
+      width: 100%;
+      margin-top: 6px; 
+    }
+
+    .market-event {
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 0;
+      color: #ffd700;
+    }
+  </style>
 </head>
 <body>
-  <div class="store-page">
+  <div class="market-page">
     <header class="store-header">
       <button class="btn red" onclick="window.location.href='dashboard.html'">⬅ Back</button>
       <div class="profile-mini">
         <div class="pfp-mini"><img id="pfp" src="images/agent.png"></div>
-        <span id="playerName"></span> | <img class="money-icon" src="images/money.png"><span id="money"></span>
+        <span id="playerName"></span> | 
+        <img class="money-icon" src="images/money.png"> <span id="money"></span>
       </div>
     </header>
 
     <main class="store-main">
-      <h1>🏦 Player Marketplace</h1>
-      <div class="search-sort-box">
-        <input id="searchInput" type="text" placeholder="Search..." oninput="renderMarketplace()">
-        <select id="sortSelect" onchange="renderMarketplace()">
-          <option value="">Sort By</option>
-          <option value="priceLow">Price: Low → High</option>
-          <option value="priceHigh">Price: High → Low</option>
-          <option value="nameAZ">Name: A → Z</option>
-          <option value="nameZA">Name: Z → A</option>
-        </select>
-      </div>
-      <ul id="listings" class="store-list"></ul>
-      <div class="sell-box">
-        <h2>Sell Item</h2>
-        <select id="itemSelect"></select>
-        <input id="priceInput" type="number" placeholder="Price">
-        <button class="btn gold" onclick="sellItem()">List for Sale</button>
+      <h1>🌍 Global Marketplace</h1>
+      <p id="marketEvent" class="market-event"></p>
+
+      <div class="market-container">
+        <!-- Sidebar: Player's Sell Options -->
+        <div class="market-side">
+          <h2>$ Instant Sell</h2>
+          <select id="sellItem"></select>
+          <input type="number" id="sellQty" placeholder="Qty" min="1">
+          <button class="btn green" onclick="sellToMarket()">Sell (50%)</button>
+
+          <h2>📦 Post Listing</h2>
+          <select id="listItem"></select>
+          <input type="number" id="listPrice" placeholder="Price" min="1">
+          <input type="number" id="listQty" placeholder="Qty" min="1">
+          <button class="btn gold" onclick="listItem()">List Item</button>
+        </div>
+
+        <!-- Main: Market Listings Grid -->
+        <div class="market-main">
+          <h2>Available Listings</h2>
+          <div id="marketListings" class="market-listings"></div>
+        </div>
       </div>
     </main>
   </div>
@@ -47,14 +158,27 @@
   </div>
 
   <script>
-    let player, marketplace=JSON.parse(localStorage.getItem("marketplace"))||[];
+    let player;
+    let marketListings = JSON.parse(localStorage.getItem("lifeSim_marketListings")) || [];
+    let marketTrend = JSON.parse(localStorage.getItem("lifeSim_marketTrend")) || {};
 
+    function rnd(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
     function formatNumber(num){ return num.toLocaleString(); }
-    function showPopup(message,type="info",buttons=[]){
-      const overlay=document.getElementById("popupOverlay"),msg=document.getElementById("popupMessage"),btns=document.getElementById("popupButtons");
-      msg.innerText=message; btns.innerHTML="";
-      if(buttons.length>0){buttons.forEach(b=>{const button=document.createElement("button");button.className="btn "+b.class;button.innerText=b.text;button.onclick=()=>{closePopup();b.onClick&&b.onClick();};btns.appendChild(button);});}
-      else{const ok=document.createElement("button");ok.className="btn gold";ok.innerText="OK";ok.onclick=()=>closePopup();btns.appendChild(ok);}
+    function getItemIcon(itemName){
+      const fileName = itemName.toLowerCase().replace(/\s+/g,"-")+".png";
+      return "images/"+fileName;
+    }
+    function savePlayer(){ localStorage.setItem("lifeSim_"+player.username, JSON.stringify(player)); }
+    function saveMarket(){
+      localStorage.setItem("lifeSim_marketListings", JSON.stringify(marketListings));
+      localStorage.setItem("lifeSim_marketTrend", JSON.stringify(marketTrend));
+    }
+    function updateMoneyUI(){ document.getElementById("money").innerText=formatNumber(player.money); }
+
+    function showPopup(msg,type="info"){
+      document.getElementById("popupMessage").innerText=msg;
+      document.getElementById("popupButtons").innerHTML="<button class='btn gold' onclick='closePopup()'>OK</button>";
+      let overlay=document.getElementById("popupOverlay");
       overlay.style.display="flex"; overlay.className="popup-overlay "+type;
     }
     function closePopup(){ document.getElementById("popupOverlay").style.display="none"; }
@@ -63,76 +187,118 @@
       const username=localStorage.getItem("lifeSim_currentUser");
       if(!username){ window.location.href="index.html"; return; }
       player=JSON.parse(localStorage.getItem("lifeSim_"+username))||{};
-      if(!player.inventory) player.inventory=[]; if(!player.money) player.money=0; if(!player.pfp) player.pfp="images/agent.png";
+      if(!player.inventory) player.inventory=[];
+      if(!player.money) player.money=0;
+      if(!player.pfp) player.pfp="images/agent.png";
       document.getElementById("playerName").innerText=player.username;
-      document.getElementById("money").innerText=formatNumber(player.money);
+      updateMoneyUI();
       document.getElementById("pfp").src=player.pfp;
-      renderSellOptions(); renderMarketplace();
+
+      generateMarketTrends();
+      renderMarket();
+      populateDropdowns();
+      maybeMarketEvent();
     }
 
-    function renderMarketplace(){
-      const container=document.getElementById("listings"); container.innerHTML="";
-      let st=document.getElementById("searchInput").value.toLowerCase();
-      let sort=document.getElementById("sortSelect").value;
-      let filtered=marketplace.map((l,i)=>({...l,idx:i})).filter(l=>l.item.toLowerCase().includes(st));
-      if(sort==="priceLow") filtered.sort((a,b)=>a.price-b.price);
-      if(sort==="priceHigh") filtered.sort((a,b)=>b.price-a.price);
-      if(sort==="nameAZ") filtered.sort((a,b)=>a.item.localeCompare(b.item));
-      if(sort==="nameZA") filtered.sort((a,b)=>b.item.localeCompare(a.item));
-      if(filtered.length===0){ container.innerHTML="<p class='dim'>⚠️ No items</p>"; return; }
-      filtered.forEach(listing=>{
-        const item=ITEMS.find(it=>it.name===listing.item);
-        container.innerHTML+=`
-          <li class="store-row">
-            <div class="item-details">
-              <img class="item-icon" src="images/${item?item.icon:'item.png'}" alt="${listing.item}">
-              <span>${listing.item}</span>
-            </div>
-            <span class="gold-text">${formatNumber(listing.price)}</span>
-            <img class="money-icon" src="images/money.png">
-            ${listing.seller!==player.username?`<button class="btn green" onclick="buyItem(${listing.idx})">Buy</button>`:`<span class="dim">Yours</span>`}
-          </li>`;
+    function generateMarketTrends(){
+      ITEMS.forEach(it=>{
+        if(!marketTrend[it.name]) marketTrend[it.name]=(rnd(80,120))/100;
+      });
+      saveMarket();
+    }
+
+    function maybeMarketEvent(){
+      if(Math.random()<0.2){
+        const randomItem=ITEMS[rnd(0,ITEMS.length-1)].name;
+        const up=Math.random()<0.5;
+        if(up){
+          marketTrend[randomItem]*=1.5;
+          document.getElementById("marketEvent").innerText=`📈 ${randomItem} prices are soaring today!`;
+        } else {
+          marketTrend[randomItem]*=0.5;
+          document.getElementById("marketEvent").innerText=`📉 Oversupply! ${randomItem} prices crashed.`;
+        }
+        saveMarket();
+      }
+    }
+
+    function renderMarket(){
+      const container=document.getElementById("marketListings");
+      container.innerHTML="";
+      if(marketListings.length===0){
+        container.innerHTML="<p>No listings yet. Be the first trader!</p>";
+        return;
+      }
+      marketListings.forEach((listing, idx)=>{
+        let price=Math.floor(listing.price*(marketTrend[listing.item]||1));
+        const iconPath=getItemIcon(listing.item);
+        container.innerHTML += `
+          <div class="item-card">
+            <img class="item-pic" src="${iconPath}" alt="${listing.item}" onerror="this.src='images/item.png';">
+            <h3>${listing.item} x${listing.qty}</h3>
+            <p>Seller: ${listing.seller}</p>
+            <p class="gold-text">${formatNumber(price)} <img class="money-icon" src="images/money.png"></p>
+            <button class="btn green" onclick="buyListing(${idx},${price})">Buy</button>
+          </div>`;
       });
     }
 
-    function renderSellOptions(){
-      let select=document.getElementById("itemSelect"); select.innerHTML="";
-      player.inventory.filter(i=>i.qty>0).forEach(i=>{
-        select.innerHTML+=`<option value="${i.item}">${i.item} (${i.qty})</option>`;
-      });
-    }
-
-    function sellItem(){
-      let itemName=document.getElementById("itemSelect").value;
-      let price=parseInt(document.getElementById("priceInput").value);
-      if(!itemName||isNaN(price)||price<=0){showPopup("⚠️ Invalid price","error");return;}
-      let invItem=player.inventory.find(i=>i.item===itemName&&i.qty>0);
-      if(invItem){ invItem.qty--; marketplace.push({seller:player.username,item:itemName,price:price,qty:1});
-        savePlayer(); saveMarketplace(); renderMarketplace(); renderSellOptions();}
-    }
-
-    function buyItem(index){
-      let listing=marketplace[index]; if(!listing)return;
-      if(player.money>=listing.price){
-        showPopup(`Buy ${listing.item} for ${formatNumber(listing.price)} money?`,"info",[
-          {text:"Yes",class:"green",onClick:()=>{
-            player.money-=listing.price;
-            let invItem=player.inventory.find(i=>i.item===listing.item);
-            if(invItem) invItem.qty++; else player.inventory.push({item:listing.item,qty:1});
-            if(listing.seller!==player.username){
-              let seller=JSON.parse(localStorage.getItem("lifeSim_"+listing.seller));
-              if(seller){ if(!seller.money)seller.money=0; seller.money+=listing.price; localStorage.setItem("lifeSim_"+seller.username,JSON.stringify(seller));}
-            }
-            marketplace.splice(index,1); savePlayer(); saveMarketplace();
-            renderMarketplace(); renderSellOptions();
-            showPopup(`✅ Purchase successful!`,"success");
-          }},
-          {text:"No",class:"red"}]);
+    function buyListing(idx,price){
+      const listing=marketListings[idx];
+      if(player.money>=price){
+        player.money-=price;
+        let inv=player.inventory.find(i=>i.item===listing.item);
+        if(inv) inv.qty+=listing.qty; else player.inventory.push({item:listing.item,qty:listing.qty});
+        savePlayer();
+        marketListings.splice(idx,1);
+        saveMarket(); renderMarket(); updateMoneyUI();
+        showPopup(`✅ Bought ${listing.item} x${listing.qty} for ${formatNumber(price)}.`,"success");
       } else showPopup("❌ Not enough money!","error");
     }
 
-    function savePlayer(){ localStorage.setItem("lifeSim_"+player.username,JSON.stringify(player)); document.getElementById("money").innerText=formatNumber(player.money);}
-    function saveMarketplace(){ localStorage.setItem("marketplace",JSON.stringify(marketplace)); }
+    function sellToMarket(){
+      const item=document.getElementById("sellItem").value;
+      const qty=parseInt(document.getElementById("sellQty").value);
+      if(!item||!qty||qty<=0) return showPopup("❌ Invalid input!","error");
+
+      let inv=player.inventory.find(i=>i.item===item);
+      if(!inv||inv.qty<qty) return showPopup("❌ Not enough.","error");
+
+      inv.qty-=qty; if(inv.qty<=0) player.inventory=player.inventory.filter(i=>i.item!==item);
+
+      let base=ITEMS.find(it=>it.name===item).price;
+      let earned=Math.floor(base*qty*0.5);
+      player.money+=earned;
+
+      savePlayer(); updateMoneyUI(); populateDropdowns();
+      showPopup(`💰 Sold ${item} x${qty} for ${formatNumber(earned)} (50%).`,"success");
+    }
+
+    function listItem(){
+      const item=document.getElementById("listItem").value;
+      const qty=parseInt(document.getElementById("listQty").value);
+      const price=parseInt(document.getElementById("listPrice").value);
+      if(!item||!qty||qty<=0||!price||price<=0) return showPopup("❌ Invalid listing!","error");
+
+      let inv=player.inventory.find(i=>i.item===item);
+      if(!inv||inv.qty<qty) return showPopup("❌ Not enough.","error");
+
+      inv.qty-=qty; if(inv.qty<=0) player.inventory=player.inventory.filter(i=>i.item!==item);
+
+      marketListings.push({item,qty,price,seller:player.username});
+      savePlayer(); saveMarket(); renderMarket(); populateDropdowns();
+      showPopup(`📦 Listed ${item} x${qty} for ${formatNumber(price)}.`,"success");
+    }
+
+    function populateDropdowns(){
+      const sellSel=document.getElementById("sellItem");
+      const listSel=document.getElementById("listItem");
+      sellSel.innerHTML=""; listSel.innerHTML="";
+      player.inventory.filter(i=>i.qty>0).forEach(i=>{
+        sellSel.innerHTML+=`<option value="${i.item}">${i.item} (x${i.qty})</option>`;
+        listSel.innerHTML+=`<option value="${i.item}">${i.item} (x${i.qty})</option>`;
+      });
+    }
 
     loadPlayer();
   </script>
