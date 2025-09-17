@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NPC Store</title>
+  <link rel="stylesheet" href="game.css">
+  <script src="items.js"></script>
+</head>
+<body>
+  <div class="store-page">
+    <header class="store-header">
+      <button class="btn red" onclick="window.location.href='store.html'">⬅ Back to Dealers</button>
+      <div class="profile-mini">
+        <div class="pfp-mini"><img id="pfp" src="images/agent.png"></div>
+        <span id="playerName"></span> | 
+        <img class="money-icon" src="images/money.png">
+        <span id="money"></span>
+      </div>
+    </header>
+
+    <main class="store-main">
+      <h1 id="dealerName"></h1>
+      <div id="dealerItems" class="dealer-items"></div>
+    </main>
+  </div>
+
+  <!-- Popup Overlay -->
+  <div id="popupOverlay" class="popup-overlay" style="display:none;">
+    <div class="popup-box">
+      <p id="popupMessage"></p>
+      <div id="popupButtons" class="popup-buttons"></div>
+    </div>
+  </div>
+
+  <script>
+    let player;
+
+    function formatNumber(num){ return num.toLocaleString(); }
+    function showPopup(msg){ document.getElementById("popupMessage").innerText=msg; document.getElementById("popupOverlay").style.display="flex"; }
+    function closePopup(){ document.getElementById("popupOverlay").style.display="none"; }
+
+    function loadPlayer(){
+      const username=localStorage.getItem("lifeSim_currentUser");
+      if(!username){ window.location.href="index.html"; return; }
+      player=JSON.parse(localStorage.getItem("lifeSim_"+username))||{};
+      if(!player.inventory) player.inventory=[];
+      if(!player.money) player.money=0;
+      if(!player.pfp) player.pfp="images/agent.png";
+      document.getElementById("playerName").innerText=player.username;
+      document.getElementById("money").innerText=formatNumber(player.money);
+      document.getElementById("pfp").src=player.pfp;
+
+      const dealer=localStorage.getItem("currentDealer");
+      if(!dealer){ window.location.href="store.html"; return; }
+      document.getElementById("dealerName").innerText=dealer;
+      renderDealerItems(dealer);
+    }
+
+    function renderDealerItems(dealer){
+      const container=document.getElementById("dealerItems");
+      container.innerHTML="";
+      ITEMS.filter(it=>it.dealer===dealer).forEach(item=>{
+        container.innerHTML += `
+          <div class="item-card">
+            <img class="item-pic" src="images/${item.icon}" alt="${item.name}" onerror="this.src='images/item.png';">
+            <h3>${item.name}</h3>
+            <p class="gold-text">
+              ${formatNumber(item.price)} <img class="money-icon" src="images/money.png" alt="Money">
+            </p>
+            <button class="btn green" onclick="buyItem('${item.name}',${item.price})">Buy</button>
+          </div>`;
+      });
+    }
+
+    function buyItem(name,price){
+      if(player.money>=price){
+        player.money-=price;
+        let found=player.inventory.find(i=>i.item===name);
+        if(found) found.qty++; else player.inventory.push({item:name,qty:1});
+        savePlayer();
+        document.getElementById("money").innerText=formatNumber(player.money);
+        showPopup(`✅ You bought ${name} for ${formatNumber(price)} money!`);
+      }else{
+        showPopup("❌ Not enough money!");
+      }
+    }
+
+    function savePlayer(){ localStorage.setItem("lifeSim_"+player.username, JSON.stringify(player)); }
+
+    loadPlayer();
+  </script>
+</body>
+</html>

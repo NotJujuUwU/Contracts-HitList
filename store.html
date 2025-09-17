@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dealers Overview</title>
+  <link rel="stylesheet" href="game.css">
+</head>
+<body>
+  <div class="store-page">
+    <header class="store-header">
+      <button class="btn red" onclick="window.location.href='dashboard.html'">⬅ Back</button>
+    </header>
+
+    <main class="store-main">
+      <h1>Choose a Dealer</h1>
+      <div class="dealer-list">
+        <div class="dealer-card" onclick="enterDealer('Dr. Bethenie')">
+          <img src="images/dr-bethenie.png" alt="Dr. Bethenie">
+          <h2>🧪 Dr. Bethenie</h2>
+          <p>Potions and Medical Supplies</p>
+        </div>
+
+        <div class="dealer-card" onclick="enterDealer('Blacksmith Joey')">
+          <img src="images/blacksmith-joey.png" alt="Blacksmith Joey">
+          <h2>⚒️ Blacksmith Joey</h2>
+          <p>Weapons and Armor</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function enterDealer(name){
+      localStorage.setItem("currentDealer", name);
+      window.location.href="npc.html"; // open the individual dealer page
+    }
+  </script>
+</body>
+</html>

@@ -1,85 +1,68 @@
-// Listen for login form submit
 document.getElementById("loginForm").addEventListener("submit", function(event) {
   event.preventDefault();
 
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const loginBox = document.querySelector(".login-container");
 
-  // Demo valid credentials (you can replace with your values)
-  const validUsername = "agent47";
-  const validPassword = "classified";
-
-  if (username === validUsername && password === validPassword) {
-    // Save username (used later in dashboard)
-    localStorage.setItem("fibUser", username);
-
-    // Hide login card
-    document.querySelector(".login-container").style.display = "none";
-
-    // Show hacker animation
-    const hackerScreen = document.getElementById("hackerScreen");
-    hackerScreen.style.display = "block";
-
-    // Hacker animation lines
-    let lines = [
-      ">>> INITIALIZING FIB MAINFRAME...",
-      ">>> AUTHORIZATION BREACHED...",
-      ">>> ENCRYPTION KEYS BYPASSED...",
-      ">>> FIREWALL DISABLED...",
-      ">>> LOADING CRIMINAL UNDERWORLD..."
-    ];
-
-    let i = 0, charIndex = 0;
-    function typeLine() {
-      if (i < lines.length) {
-        if (charIndex < lines[i].length) {
-          hackerScreen.textContent += lines[i][charIndex];
-          charIndex++;
-          setTimeout(typeLine, 20); // typing speed
-        } else {
-          hackerScreen.textContent += "\n";
-          i++; 
-          charIndex = 0;
-          setTimeout(typeLine, 120); // pause before next line
-        }
-      } else {
-        setTimeout(() => { 
-          window.location.href = "dashboard.html"; 
-        }, 1000); // redirect after final line
-      }
-    }
-    typeLine();
-
-  } else {
-    // Wrong login: Shake effect
-    const loginBox = document.querySelector(".login-container");
+  if (!username || !password) {
     loginBox.classList.add("shake");
-
-    // Remove shake class after animation ends
-    setTimeout(() => {
-      loginBox.classList.remove("shake");
-    }, 400);
-
-    // Remove old error if already shown
-    let oldMsg = document.querySelector(".error");
-    if (oldMsg) oldMsg.remove();
-
-    // Show error
-    const msg = document.createElement("p");
-    msg.textContent = "Access Denied. Invalid credentials.";
-    msg.style.color = "red";
-    msg.className = "error";
-    document.getElementById("loginForm").appendChild(msg);
+    setTimeout(() => loginBox.classList.remove("shake"), 400);
+    return;
   }
+
+  // Look for existing profile
+  let playerData = localStorage.getItem("lifeSim_" + username);
+
+  if (!playerData) {
+    // New agent profile
+    playerData = {
+      username: username,
+      gold: 100,
+      inventory: [ { item: "Health Potion", qty: 2 } ]
+    };
+    localStorage.setItem("lifeSim_" + username, JSON.stringify(playerData));
+  }
+
+  // Track current login
+  localStorage.setItem("lifeSim_currentUser", username);
+
+  // Hacker screen animation
+  loginBox.style.display = "none";
+  const hackerScreen = document.getElementById("hackerScreen");
+  hackerScreen.style.display = "block";
+
+  let lines = [
+    ">>> INITIALIZING FIB MAINFRAME...",
+    ">>> VALIDATING AGENT " + username + " ...",
+    ">>> ACCESS CODE ACCEPTED...",
+    ">>> LOADING AGENT DASHBOARD..."
+  ];
+
+  let i = 0, j = 0;
+  function typeLine() {
+    if (i < lines.length) {
+      if (j < lines[i].length) {
+        hackerScreen.textContent += lines[i][j];
+        j++;
+        setTimeout(typeLine, 20);
+      } else {
+        hackerScreen.textContent += "\n";
+        i++; j = 0;
+        setTimeout(typeLine, 120);
+      }
+    } else {
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 1000);
+    }
+  }
+  typeLine();
 });
 
-// ========================
-// INFO BUTTON POPUP
-// ========================
+// Info popup
 function toggleInfo() {
   const popup = document.getElementById("infoPopup");
   popup.style.display = (popup.style.display === "block") ? "none" : "block";
 }
-
-// 👇 Important: Expose globally so HTML inline onclick works
 window.toggleInfo = toggleInfo;

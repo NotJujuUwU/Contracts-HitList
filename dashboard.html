@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="game.css">
+  <script src="items.js"></script>
+</head>
+<body>
+  <div class="dashboard-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="profile">
+        <div class="pfp-container">
+          <img id="pfp" src="images/agent.png" alt="Profile Picture">
+        </div>
+        <input type="file" id="pfpUpload" accept="image/*" style="display:none;" onchange="setPfp(event)">
+        <h2 id="playerName"></h2>
+        <p>
+          <img class="money-icon" src="images/money.png" alt="Money">
+          <span id="money"></span>
+        </p>
+      </div>
+
+      <nav class="menu">
+        <button onclick="showSection('overview')">🏠 Overview</button>
+        <button onclick="showSection('inventory')">🎒 Inventory</button>
+        <button onclick="showSection('quests')">⚔️ Quests</button>
+        <button onclick="window.location.href='store.html'">🏬 Stores</button>
+        <button onclick="window.location.href='market.html'">🏦 Marketplace</button>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div id="overview" class="section">
+        <h1>Player Overview</h1>
+        <p><b>Name:</b> <span id="overviewName"></span></p>
+        <p><b>Money:</b> <img class="money-icon" src="images/money.png"> <span id="overviewMoney"></span></p>
+      </div>
+
+      <div id="inventory" class="section" style="display:none;">
+        <h1>Your Inventory</h1>
+        <ul id="inventoryList" class="inventory-list"></ul>
+      </div>
+
+      <div id="quests" class="section" style="display:none;">
+        <h1>Quests</h1>
+        <button class="btn gold" id="questBtn" onclick="startQuest()">⚔️ Embark on Quest</button>
+        <div id="questStatus" class="quest-status"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Popup overlay -->
+  <div id="popupOverlay" class="popup-overlay" style="display:none;">
+    <div class="popup-box">
+      <p id="popupMessage"></p>
+      <div id="popupButtons" class="popup-buttons"></div>
+    </div>
+  </div>
+
+  <script>
+    let player;
+
+    function formatNumber(num){ return num.toLocaleString(); }
+
+    function showPopup(message,type="info",buttons=[]){
+      const overlay=document.getElementById("popupOverlay"),
+            msg=document.getElementById("popupMessage"),
+            btns=document.getElementById("popupButtons");
+      msg.innerText=message; btns.innerHTML="";
+      if(buttons.length>0){
+        buttons.forEach(b=>{
+          const button=document.createElement("button");
+          button.className="btn "+b.class; button.innerText=b.text;
+          button.onclick=()=>{ closePopup(); b.onClick&&b.onClick();};
+          btns.appendChild(button);
+        });
+      } else {
+        const ok=document.createElement("button");
+        ok.className="btn gold"; ok.innerText="OK";
+        ok.onclick=()=>closePopup(); btns.appendChild(ok);
+      }
+      overlay.style.display="flex"; overlay.className="popup-overlay "+type;
+    }
+    function closePopup(){ document.getElementById("popupOverlay").style.display="none"; }
+
+    function getItemIcon(itemName){
+      const fileName=itemName.toLowerCase().replace(/\s+/g,"-")+".png";
+      return "images/"+fileName;
+    }
+
+    function loadPlayer(){
+      const username=localStorage.getItem("lifeSim_currentUser");
+      if(!username){ window.location.href="index.html"; return; }
+      player=JSON.parse(localStorage.getItem("lifeSim_"+username))||{};
+      if(!player.inventory) player.inventory=[]; if(!player.money) player.money=0; if(!player.pfp) player.pfp="images/agent.png";
+      document.getElementById("playerName").innerText=player.username;
+      document.getElementById("money").innerText=formatNumber(player.money);
+      document.getElementById("overviewName").innerText=player.username;
+      document.getElementById("overviewMoney").innerText=formatNumber(player.money);
+      document.getElementById("pfp").src=player.pfp;
+      renderInventory();
+    }
+
+    function renderInventory(){
+      let invList=document.getElementById("inventoryList");
+      invList.innerHTML="";
+      player.inventory.filter(i=>i.qty>0).forEach(i=>{
+        let iconPath=getItemIcon(i.item);
+        invList.innerHTML+=`
+          <li class="inventory-row">
+            <span class="inv-qty">${i.qty}</span>
+            <img class="item-icon" src="${iconPath}" alt="${i.item}" onerror="this.src='images/item.png';">
+            <span class="inv-name">${i.item}</span>
+          </li>`;
+      });
+    }
+
+    function startQuest(){
+      const questBtn=document.getElementById("questBtn"), questStatus=document.getElementById("questStatus");
+      questBtn.disabled=true; questBtn.innerText="⏳ Quest in Progress..."; questStatus.innerText="Adventuring...";
+      let dots=0;
+      const anim=setInterval(()=>{ dots=(dots+1)%4; questStatus.innerText="Adventuring"+".".repeat(dots);},500);
+      setTimeout(()=>{ clearInterval(anim);
+        const reward=Math.floor(Math.random()*50)+10;
+        player.money+=reward; savePlayer();
+        document.getElementById("money").innerText=formatNumber(player.money);
+        document.getElementById("overviewMoney").innerText=formatNumber(player.money);
+        showPopup(`✨ You earned ${formatNumber(reward)} money!`,"success");
+        questBtn.disabled=false; questBtn.innerText="⚔️ Embark on Quest";
+      },4000);
+    }
+
+    function showSection(id){ document.querySelectorAll(".section").forEach(sec=>sec.style.display="none"); document.getElementById(id).style.display="block"; }
+    function logout(){ localStorage.removeItem("lifeSim_currentUser"); window.location.href="index.html"; }
+    function savePlayer(){ localStorage.setItem("lifeSim_"+player.username,JSON.stringify(player)); }
+
+    loadPlayer();
+  </script>
+</body>
+</html>
