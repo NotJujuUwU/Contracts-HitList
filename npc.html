@@ -36,8 +36,45 @@
     let player;
 
     function formatNumber(num){ return num.toLocaleString(); }
-    function showPopup(msg){ document.getElementById("popupMessage").innerText=msg; document.getElementById("popupOverlay").style.display="flex"; }
-    function closePopup(){ document.getElementById("popupOverlay").style.display="none"; }
+
+    // ✅ Unified popup system with yes/no images
+    function showPopup(message, type="info", buttons=[]){
+      const overlay = document.getElementById("popupOverlay"),
+            msg = document.getElementById("popupMessage"),
+            btns = document.getElementById("popupButtons");
+
+      let icon = "";
+      if(type==="success") icon = "<img src='images/yes.png' style='width:24px;vertical-align:middle;margin-right:6px'>";
+      if(type==="error")   icon = "<img src='images/no.png' style='width:24px;vertical-align:middle;margin-right:6px'>";
+
+      msg.innerHTML = icon + message;
+      btns.innerHTML = "";
+
+      if(buttons.length>0){
+        buttons.forEach(b=>{
+          const button=document.createElement("button");
+          button.className="btn "+(b.class||"gold");
+          button.innerText=b.text;
+          button.onclick=()=>{
+            closePopup();
+            if(b.onClick) b.onClick();
+          };
+          btns.appendChild(button);
+        });
+      } else {
+        const ok=document.createElement("button");
+        ok.className="btn gold";
+        ok.innerText="OK";
+        ok.onclick=()=>closePopup();
+        btns.appendChild(ok);
+      }
+
+      overlay.style.display="flex";
+      overlay.className="popup-overlay "+type;
+    }
+    function closePopup(){
+      document.getElementById("popupOverlay").style.display="none";
+    }
 
     function loadPlayer(){
       const username=localStorage.getItem("lifeSim_currentUser");
@@ -46,6 +83,7 @@
       if(!player.inventory) player.inventory=[];
       if(!player.money) player.money=0;
       if(!player.pfp) player.pfp="images/agent.png";
+
       document.getElementById("playerName").innerText=player.username;
       document.getElementById("money").innerText=formatNumber(player.money);
       document.getElementById("pfp").src=player.pfp;
@@ -60,12 +98,12 @@
       const container=document.getElementById("dealerItems");
       container.innerHTML="";
       ITEMS.filter(it=>it.dealer===dealer).forEach(item=>{
-        container.innerHTML += `
+        container.innerHTML+=`
           <div class="item-card">
             <img class="item-pic" src="images/${item.icon}" alt="${item.name}" onerror="this.src='images/item.png';">
             <h3>${item.name}</h3>
             <p class="gold-text">
-              ${formatNumber(item.price)} <img class="money-icon" src="images/money.png" alt="Money">
+              ${formatNumber(item.price)} <img class="money-icon" src="images/money.png">
             </p>
             <button class="btn green" onclick="buyItem('${item.name}',${item.price})">Buy</button>
           </div>`;
@@ -74,18 +112,24 @@
 
     function buyItem(name,price){
       if(player.money>=price){
-        player.money-=price;
-        let found=player.inventory.find(i=>i.item===name);
-        if(found) found.qty++; else player.inventory.push({item:name,qty:1});
-        savePlayer();
-        document.getElementById("money").innerText=formatNumber(player.money);
-        showPopup(`✅ You bought ${name} for ${formatNumber(price)} money!`);
-      }else{
-        showPopup("❌ Not enough money!");
+        showPopup(`Do you want to buy ${name} for ${formatNumber(price)} money?`,"info",[
+          {text:"Confirm",class:"green",onClick:()=>{
+            player.money-=price;
+            let found=player.inventory.find(i=>i.item===name);
+            if(found) found.qty++;
+            else player.inventory.push({item:name,qty:1});
+            savePlayer();
+            document.getElementById("money").innerText=formatNumber(player.money);
+            showPopup(`You bought ${name} for ${formatNumber(price)} money!`,"success");
+          }},
+          {text:"Cancel",class:"red"}
+        ]);
+      } else {
+        showPopup("Not enough money!","error");
       }
     }
 
-    function savePlayer(){ localStorage.setItem("lifeSim_"+player.username, JSON.stringify(player)); }
+    function savePlayer(){ localStorage.setItem("lifeSim_"+player.username,JSON.stringify(player)); }
 
     loadPlayer();
   </script>

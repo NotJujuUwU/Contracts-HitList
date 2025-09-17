@@ -209,3 +209,262 @@ body { margin:0; font-family:"Segoe UI",sans-serif; background:#121212; color:#e
   border-radius:8px;
   margin-bottom:10px;
 }
+
+/* === Marketplace Specific Fixes === */
+.market-listings .item-card {
+  text-align: left !important;   /* force bubble text to align left */
+  padding: 12px;
+  width: 160px;                  /* smaller bubbles */
+}
+
+.market-listings .item-card img.item-pic {
+  display: block;
+  margin: 0 auto 8px auto;       /* image centered */
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+.market-listings .item-card h3,
+.market-listings .item-card p {
+  margin: 4px 0;
+  text-align: left !important;   /* override NPC/shop centering */
+  font-size: 0.85rem;
+}
+
+.market-listings .item-card button {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+}
+
+/* --- Force Marketplace Cards to Left Align --- */
+.market-listings .item-card,
+.market-listings .item-card h3,
+.market-listings .item-card p,
+.market-listings .item-card .gold-text {
+  text-align: left !important;  /* hard force left */
+}
+.market-listings .item-card img.item-pic {
+  display: block;
+  margin: 0 auto 8px auto;       /* keep images centered */
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+.market-listings .item-card button {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.market-side label {
+  align-self: flex-start;   /* push labels all the way left */
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin: 5px 0 3px 5px;   /* little padding on the left */
+  color: #FFD700;          /* gold, to match RPG theme */
+}
+
+/* Compact number fields in market sidebar */
+.market-side input[type="number"] {
+  width: 80px;            /* 👈 now short */
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Widen dropdowns for item names */
+.market-side select {
+  width: 180px;           /* a bit wider for item names */
+  margin-bottom: 10px;
+}
+
+/* Buttons remain full width for consistency */
+.market-side button {
+  width: 100%;
+  margin-top: 5px;
+}
+
+/* Marketplace Container alignment fix */
+.market-container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 30px;
+  margin-top: 10px;   /* less gap under header */
+  align-items: flex-start;
+}
+
+/* Sidebar panel pushed slightly down */
+.market-side {
+  margin-top: 15px;   /* 👈 push menu down from header */
+}
+
+/* Marketplace Main – pull section closer to header */
+.market-main h1, 
+.market-main h2 {
+  margin-top: 0; 
+  padding-top: 0;
+}
+
+/* --- Profile mini HUD: money display --- */
+.profile-mini .money-icon {
+  width: 22px;      /* bigger coin */
+  height: 22px;
+  margin-right: 4px;
+}
+
+.profile-mini #money {
+  font-size: 1.1rem;  /* bump size */
+  font-weight: bold;  /* make it stand out */
+  color: #FFD700;     /* gold text to match the theme */
+}
+
+/* --- Profile mini HUD alignment --- */
+.profile-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;             /* spacing between avatar, name, and money */
+  margin-right: 20px;    /* pull everything left away from right edge */
+}
+
+.profile-mini .money-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 4px;
+}
+
+.profile-mini #money {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #FFD700;
+  min-width: 70px;       /* ensures space for bigger numbers */
+  text-align: left;      /* always start money text from the left */
+}
+
+/* Make Overview Name & Money lines larger */
+#overview p {
+  font-size: 1.5em;   /* 50% larger than normal */
+  font-weight: bold;
+  margin: 8px 0;
+}
+
+#overview .money-icon {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+/* --- Specific icon tweaks --- */
+
+/* Ensure every stat row has perfect vertical alignment */
+.inventory-stats li {
+  display: flex;
+  align-items: center;   /* icons + text vertically centered together */
+  margin: 10px 0;
+}
+
+/* Apply a little spacing after any icon */
+.inventory-stats li img.stat-icon {
+  margin-right: 8px;
+}
+
+/* Bigger specific icons */
+#mana-icon,
+img.stat-icon[src*="slash-resistance"] {
+  width: 35px !important;
+  height: 35px !important;
+}
+
+/* Force stat rows aligned: ALL icons share same box */
+.inventory-stats li {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.inventory-stats li img.stat-icon,
+.inventory-stats li #mana-icon {
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  margin-right: 10px;
+  object-fit: contain;
+  display: block;
+}
+
+/* --- Make Mana & Slash larger but KEEP alignment --- */
+
+/* Mana */
+#mana-icon {
+  transform: scale(1.15);   /* 15% bigger inside its 35px box */
+}
+
+/* Slash Resistance */
+.stat-icon[src*="slash-resistance"] {
+  transform: scale(1.15);   /* also enlarge slightly */
+}
+
+/* --- Universal Stat Row Alignment --- */
+.inventory-stats li {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.inventory-stats li img.stat-icon,
+.inventory-stats li #mana-icon {
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  margin-right: 10px;
+  object-fit: contain;
+  display: block;
+}
+
+/* --- Slight Adjustments to Specific Icons --- */
+
+/* Make Mana & Slash a bit bigger */
+#mana-icon {
+  transform: scale(1.15);   /* 15% bigger */
+}
+.stat-icon[src*="slash-resistance"] {
+  transform: scale(1.15);   /* 15% bigger */
+}
+
+/* Make Armor & Health a bit smaller */
+.stat-icon[src*="armor"] {
+  transform: scale(0.9);    /* 10% smaller */
+}
+.stat-icon[src*="health"] {
+  transform: scale(0.9);    /* 10% smaller */
+}
+
+/* Add a little gap between label text and the stat value */
+.inventory-stats li span {
+  margin-left: 4px;   /* adjust to 6px or 8px if you want more spacing */
+  color: #00ccff;     /* keeps your nice stat value color */
+  font-weight: bold;
+}
+
+/* Fix star icon next to Level */
+.align-star {
+  width: 20px !important;
+  height: 20px !important;
+  margin-right: 6px;
+  position: relative;
+  top: 0;                /* center it with text */
+  transform: none !important;  /* make sure it doesn’t scale up */
+}
+
+/* ⭐ Star icon fix for Level */
+.align-star {
+  width: 18px !important;     /* smaller than your other stat icons */
+  height: 18px !important;
+  margin-right: 1px;          /* space between star and text */
+  flex-shrink: 0;
+  
+  /* alignment adjustments */
+  position: relative;
+  top: 2px;                   /* nudges down so it lines with text */
+}

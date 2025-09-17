@@ -29,7 +29,51 @@ const ITEMS = [
     name: "Steel Shield",
     price: 700,
     type: "armor",
+    slot: "offhand",
+    stats: { armor: 8 },
     icon: "steel-shield.png",
+    dealer: "Blacksmith Joey"
+  },
+
+  // 🛡 Iron Armor Set
+  {
+    id: "iron-boots",
+    name: "Iron Boots",
+    price: 300,
+    type: "armor",
+    slot: "boots",
+    stats: { armor: 5 },
+    icon: "iron-boots.png",
+    dealer: "Blacksmith Joey"
+  },
+  {
+    id: "iron-leggings",
+    name: "Iron Leggings",
+    price: 500,
+    type: "armor",
+    slot: "legs",
+    stats: { armor: 10 },
+    icon: "iron-leggings.png",
+    dealer: "Blacksmith Joey"
+  },
+  {
+    id: "iron-chestplate",
+    name: "Iron Chestplate",
+    price: 800,
+    type: "armor",
+    slot: "chest",
+    stats: { armor: 15 },
+    icon: "iron-chestplate.png",
+    dealer: "Blacksmith Joey"
+  },
+  {
+    id: "iron-helmet",
+    name: "Iron Helmet",
+    price: 400,
+    type: "armor",
+    slot: "head",
+    stats: { armor: 7 },
+    icon: "iron-helmet.png",
     dealer: "Blacksmith Joey"
   }
 ];
