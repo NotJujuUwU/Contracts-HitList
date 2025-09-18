@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
-  <link rel="stylesheet" href="game.css">
-  <script src="items.js"></script>
+  <link rel="stylesheet" href="./game.css?v=0.41">
+  <script src="./items.js?v=0.41"></script>
   <style>
     /* --- Tabs --- */
     .inv-tabs {
@@ -16,7 +16,7 @@
     .inv-tab {
       flex: 1;
       padding: 8px;
-      background: #222; /* unified dashboard background */
+      background: #222;
       color: #fff;
       border: none;
       cursor: pointer;
@@ -36,7 +36,7 @@
       border: 1px solid #444;
       border-radius: 6px;
       padding: 5px;
-      background: #222; /* same color as overall dashboard */
+      background: #222;
     }
 
     /* Custom scrollbar styling */
@@ -50,33 +50,78 @@
     .inv-list-container::-webkit-scrollbar-track {
       background: #222;
     }
+
+    /* --- Resources Section --- */
+    #resourcesSection {
+      margin-top: 20px;
+    }
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .resource-card {
+      width: 100px;
+      height: 100px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 6px;
+      text-align: center;
+      color: #fff;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .resource-card img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+    .resource-card .res-name {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.2em;
+    }
+    .resource-card .res-qty {
+      font-size: 14px;
+      font-weight: bold;
+      background: #ff9900;
+      border-radius: 4px;
+      color: #000;
+      padding: 2px 6px;
+    }
   </style>
 </head>
 <body>
 <div class="dashboard-layout">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="profile">
-      <div class="pfp-container">
-        <img id="pfp" src="images/agent.png" alt="Profile Picture">
-      </div>
-      <input type="file" id="pfpUpload" accept="image/*" style="display:none;" onchange="setPfp(event)">
-      <h2 id="playerName"></h2>
-      <p>
-        <img class="money-icon" src="images/money.png" alt="Money">
-        <span id="money"></span>
-      </p>
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="profile">
+    <div class="pfp-container">
+      <img id="pfp" src="./images/agent.png" alt="Profile Picture">
     </div>
-    <nav class="menu">
-      <button onclick="showSection('overview')">🏠 Overview</button>
-      <button onclick="showSection('inventory')">🎒 Inventory</button>
-      <button onclick="window.location.href='dungeons.html'">⚔️ Dungeons</button>
-      <button onclick="showSection('quests')">📜 Quests</button>
-      <button onclick="window.location.href='dealers.html'">🏬 Stores</button>
-      <button onclick="window.location.href='market.html'">🏦 Marketplace</button>
-      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
-    </nav>
-  </aside>
+    <input type="file" id="pfpUpload" accept="image/*" style="display:none;" onchange="setPfp(event)">
+    <h2 id="playerName"></h2>
+    <p>
+      <img class="money-icon" src="./images/money.png" alt="Money">
+      <span id="money"></span>
+    </p>
+  </div>
+  <nav class="menu">
+    <button onclick="showSection('overview')">🏠 Overview</button>
+    <button onclick="showSection('inventory')">🎒 Inventory</button>
+    <button onclick="window.location.href='dungeons.html'">⚔️ Dungeons</button>
+    <button onclick="showSection('quests')">📜 Quests</button>
+    <button onclick="window.location.href='dealers.html'">🏬 Stores</button>
+    <button onclick="window.location.href='market.html'">🏦 Marketplace</button>
+    <button onclick="window.location.href='workshop.html'">🔨 Workshop</button>
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </nav>
+</aside>
 
   <!-- Main Content -->
   <main class="content">
@@ -85,7 +130,7 @@
       <p class="player-id">Player ID: <span id="playerID">0000000000</span></p>
       <h1>Player Overview</h1>
       <p><b>Name:</b> <span id="overviewName"></span></p>
-      <p><b>Money:</b> <img class="money-icon" src="images/money.png" alt="Money"> <span id="overviewMoney"></span></p>
+      <p><b>Money:</b> <img class="money-icon" src="./images/money.png" alt="Money"> <span id="overviewMoney"></span></p>
       <div class="stats-grid">
         <div class="stat-card"><h3>🏰 Dungeons Done</h3><p id="statDone">0</p></div>
         <div class="stat-card"><h3>💀 Dungeons Failed</h3><p id="statFailed">0</p></div>
@@ -103,17 +148,17 @@
           <h2>Stats</h2>
           <div class="inventory-stats">
             <ul>
-              <li><img src="images/health.png" class="stat-icon" alt="Health"> Health: <span id="statHealth">100 / 100</span></li>
-              <li><img src="images/mana.png" class="stat-icon" alt="Mana"> Mana: <span id="statMana">100 / 100</span></li>
-              <li><img src="images/armor.png" class="stat-icon" alt="Armor"> Armor: <span id="statArmor">0</span></li>
-              <li><img src="images/damage.png" class="stat-icon" alt="Damage"> Damage: <span id="statDamage">0</span></li>
-              <li><img src="images/slash-resistance.png" class="stat-icon" alt="Slash"> Slash Resistance: <span id="statSlash">0</span></li>
-              <li><img src="images/magic-resistance.png" class="stat-icon" alt="Magic"> Magic Resistance: <span id="statMagic">0</span></li>
-              <li><img src="images/projectile-resistance.png" class="stat-icon" alt="Projectile"> Projectile Resistance: <span id="statProj">0</span></li>
+              <li><img src="./images/health.png" class="stat-icon" alt="Health"> Health: <span id="statHealth">100 / 100</span></li>
+              <li><img src="./images/mana.png" class="stat-icon" alt="Mana"> Mana: <span id="statMana">100 / 100</span></li>
+              <li><img src="./images/armor.png" class="stat-icon" alt="Armor"> Armor: <span id="statArmor">0</span></li>
+              <li><img src="./images/damage.png" class="stat-icon" alt="Damage"> Damage: <span id="statDamage">0</span></li>
+              <li><img src="./images/slash-resistance.png" class="stat-icon" alt="Slash"> Slash Resistance: <span id="statSlash">0</span></li>
+              <li><img src="./images/magic-resistance.png" class="stat-icon" alt="Magic"> Magic Resistance: <span id="statMagic">0</span></li>
+              <li><img src="./images/projectile-resistance.png" class="stat-icon" alt="Projectile"> Projectile Resistance: <span id="statProj">0</span></li>
             </ul>
           </div>
           <div class="stat-card">
-            <h3><img src="images/star.png" class="stat-icon align-star" alt="Level"> Level</h3>
+            <h3><img src="./images/star.png" class="stat-icon align-star" alt="Level"> Level</h3>
             <p id="statLevel">1</p>
             <div id="xpBarOuter"><div id="xpBarInner"></div></div>
             <small><span id="xpDisplay">0 / 100</span> XP</small>
@@ -125,19 +170,21 @@
         <!-- RIGHT: Tabbed Inventory -->
         <div class="inventory-right">
           <h2>Inventory</h2>
-
-          <!-- Tabs -->
           <div class="inv-tabs">
             <button class="inv-tab active" onclick="switchInvTab('consumables')">🍎 Consumables</button>
             <button class="inv-tab" onclick="switchInvTab('equipment')">⚔️ Equipment</button>
           </div>
-
-          <!-- Scrollable list container -->
           <div class="inv-list-container">
             <ul id="consumableList" class="inventory-list"></ul>
             <ul id="equipmentList" class="inventory-list" style="display:none;"></ul>
           </div>
         </div>
+      </div>
+
+      <!-- NEW: Resources Section -->
+      <div id="resourcesSection" style="display:none;">
+        <h2>Resources</h2>
+        <div class="resources-grid" id="resourceCards"></div>
       </div>
     </div>
 
@@ -158,7 +205,7 @@
   </div>
 </div>
 
-<div class="version-label">v0.37</div>
+<div class="version-label">v0.42</div>
 
 <script>
   let player;
@@ -171,8 +218,8 @@
           msg=document.getElementById("popupMessage"),
           btns=document.getElementById("popupButtons");
     let icon="";
-    if(type==="success") icon="<img src='images/yes.png' style='width:20px;margin-right:6px'>";
-    if(type==="error")   icon="<img src='images/no.png' style='width:20px;margin-right:6px'>";
+    if(type==="success") icon="<img src='./images/yes.png' style='width:20px;margin-right:6px'>";
+    if(type==="error")   icon="<img src='./images/no.png' style='width:20px;margin-right:6px'>";
     msg.innerHTML=icon+message;
     btns.innerHTML="";
     const ok=document.createElement("button");
@@ -186,7 +233,7 @@
   // === ITEM ICON HELPER ===
   function getItemIcon(itemName){
     const fileName=itemName.toLowerCase().replace(/\s+/g,"-")+".png";
-    return "images/"+fileName;
+    return "./images/"+fileName;
   }
 
   // === XP + LEVELS ===
@@ -204,10 +251,7 @@
     document.getElementById("statLevel").innerText=player.level;
     const percent=Math.floor((player.xp/player.nextLevelXp)*100);
     document.getElementById("xpDisplay").innerText=`${player.xp} / ${player.nextLevelXp} XP (${percent}%)`;
-    const bar=document.getElementById("xpBarInner");
-    bar.style.width=percent+"%";
-    if(percent>=100){ bar.classList.add("full"); } 
-    else { bar.classList.remove("full"); }
+    document.getElementById("xpBarInner").style.width=percent+"%";
   }
 
   // === HEAL & MANA RESTORE ===
@@ -248,10 +292,14 @@
     const item=player.inventory.find(i=>i.item===itemName);
     const def=ITEMS.find(it=>it.name===itemName);
     if(!item||!def) return;
-    player.inventory.forEach(it=>{
-      const d=ITEMS.find(dd=>dd.name===it.item);
-      if(d&&d.slot===def.slot){ it.equipped=false; }
-    });
+
+    if (["pickaxe","sword","shield"].includes(def.slot)) {
+      player.inventory.forEach(it=>{
+        const d=ITEMS.find(dd=>dd.name===it.item);
+        if(d && d.slot===def.slot){ it.equipped=false; }
+      });
+    }
+
     item.equipped=true;
     savePlayer(); renderInventory(); updateStatsFromEquipment();
   }
@@ -282,12 +330,18 @@
     savePlayer(); updateStatsUI();
   }
 
-  // === INVENTORY SPLIT & RENDER ===
+  // === INVENTORY RENDER ===
   function renderInventory(){
-    const consumableList=document.getElementById("consumableList");
-    const equipmentList=document.getElementById("equipmentList");
-    consumableList.innerHTML="";
-    equipmentList.innerHTML="";
+    const consumableList = document.getElementById("consumableList");
+    const equipmentList  = document.getElementById("equipmentList");
+    const resourceCards  = document.getElementById("resourceCards");
+    const resourcesBox   = document.getElementById("resourcesSection");
+
+    consumableList.innerHTML = "";
+    equipmentList.innerHTML  = "";
+    resourceCards.innerHTML  = "";
+
+    let hasResources = false;
 
     player.inventory.filter(i=>i.qty>0).forEach(i=>{
       let iconPath=getItemIcon(i.item);
@@ -306,17 +360,36 @@
         actionButton = `<button class="btn green" onclick="equipItem('${i.item}')">Equip</button>`;
       }
 
-      const row=`
+      if(def?.type==="consumable"){ 
+        consumableList.innerHTML+=`
         <li class="inventory-row ${equippedClass}" title="${statsPreview}">
           <span class="inv-qty">${i.qty}</span>
-          <img class="item-icon" src="${iconPath}" alt="${i.item}" onerror="this.src='images/item.png';">
+          <img class="item-icon" src="${iconPath}" alt="${i.item}" onerror="this.src='./images/item.png';">
           <span class="inv-name">${i.item}</span>
           ${actionButton}
         </li>`;
-
-      if(def?.type==="consumable"){ consumableList.innerHTML+=row; }
-      else { equipmentList.innerHTML+=row; }
+      }
+      else if(def?.type==="equipment"){ 
+        equipmentList.innerHTML+=`
+        <li class="inventory-row ${equippedClass}" title="${statsPreview}">
+          <span class="inv-qty">${i.qty}</span>
+          <img class="item-icon" src="${iconPath}" alt="${i.item}" onerror="this.src='./images/item.png';">
+          <span class="inv-name">${i.item}</span>
+          ${actionButton}
+        </li>`;
+      }
+      else if(def?.type==="resource"){ 
+        hasResources=true;
+        resourceCards.innerHTML+=`
+        <div class="resource-card">
+          <img src="${iconPath}" alt="${i.item}" onerror="this.src='./images/item.png';">
+          <span class="res-name">${i.item}</span>
+          <span class="res-qty">${i.qty}</span>
+        </div>`;
+      }
     });
+
+    resourcesBox.style.display = hasResources ? "block" : "none";
   }
 
   // === USE ITEM ===
@@ -324,14 +397,11 @@
     const invItem = player.inventory.find(i => i.item === itemName);
     const def = ITEMS.find(it => it.name === itemName);
     if(!invItem || !def || !def.use) return;
-    const wasUsed = def.use();  // must return true/false
+    const wasUsed = def.use();  
     if(wasUsed){
       invItem.qty--;
-      if(invItem.qty <= 0){
-        player.inventory = player.inventory.filter(i=>i.item !== itemName);
-      }
-      savePlayer();
-      renderInventory();
+      if(invItem.qty <= 0){ player.inventory = player.inventory.filter(i=>i.item !== itemName); }
+      savePlayer(); renderInventory();
     }
   }
 
@@ -369,7 +439,7 @@
     player=JSON.parse(localStorage.getItem("lifeSim_"+username))||{};
     if(!player.inventory) player.inventory=[];
     if(!player.money) player.money=0;
-    if(!player.pfp) player.pfp="images/agent.png";
+    if(!player.pfp) player.pfp="./images/agent.png";
     if(!player.dungeonsDone) player.dungeonsDone=0;
     if(!player.dungeonsFailed) player.dungeonsFailed=0;
     if(!player.totalEarned) player.totalEarned=0;

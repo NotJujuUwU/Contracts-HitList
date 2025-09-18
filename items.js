@@ -6,23 +6,16 @@ const ITEMS = [
     name: "Health Potion",
     price: 100,
     type: "consumable",
-    icon: "health-potion.png",
     dealer: "Dr. Bethanie",
-    use: () => {
-      // heal() returns true if used, false if not used
-      return heal(50);
-    }
+    use: () => heal(50)
   },
   {
     id: "mana-potion",
     name: "Mana Potion",
     price: 120,
     type: "consumable",
-    icon: "mana-potion.png",
     dealer: "Dr. Bethanie",
-    use: () => {
-      return restoreMana(50);
-    }
+    use: () => restoreMana(50)
   },
 
   // === Weapons & Shields ===
@@ -33,7 +26,6 @@ const ITEMS = [
     type: "equipment",
     slot: "weapon",          
     stats: { damage: 5 },
-    icon: "iron-sword.png",
     dealer: "Blacksmith Joey"
   },
   {
@@ -43,7 +35,6 @@ const ITEMS = [
     type: "equipment",
     slot: "offhand",
     stats: { armor: 8 },
-    icon: "steel-shield.png",
     dealer: "Blacksmith Joey"
   },
 
@@ -55,7 +46,6 @@ const ITEMS = [
     type: "equipment",
     slot: "boots",
     stats: { armor: 5 },
-    icon: "iron-boots.png",
     dealer: "Blacksmith Joey"
   },
   {
@@ -65,7 +55,6 @@ const ITEMS = [
     type: "equipment",
     slot: "legs",
     stats: { armor: 10 },
-    icon: "iron-leggings.png",
     dealer: "Blacksmith Joey"
   },
   {
@@ -75,7 +64,6 @@ const ITEMS = [
     type: "equipment",
     slot: "chest",
     stats: { armor: 15 },
-    icon: "iron-chestplate.png",
     dealer: "Blacksmith Joey"
   },
   {
@@ -85,7 +73,42 @@ const ITEMS = [
     type: "equipment",
     slot: "head",
     stats: { armor: 7 },
-    icon: "iron-helmet.png",
     dealer: "Blacksmith Joey"
+  },
+
+  // === Tools ===
+  {
+    id: "iron-pickaxe",
+    name: "Iron Pickaxe",
+    price: 600,
+    type: "equipment",
+    slot: "tool",
+    toolType: "pickaxe",  
+    dealer: "Blacksmith Joey",
+    description: "A sturdy iron pickaxe, lets you mine ores in dungeons."
+  },
+
+  // === Resources ===
+  {
+    id: "iron-ore",
+    name: "Iron Ore",
+    price: 50,
+    type: "resource",
+    description: "A chunk of raw iron. Can be smelted into ingots."
+  },
+  {
+    id: "iron-ingot",
+    name: "Iron Ingot",
+    price: 150,
+    type: "resource",
+    description: "A refined bar of iron, crucial for blacksmithing."
+  },
+  {
+    id: "coal",
+    name: "Coal",
+    price: 50,
+    type: "resource",
+    dealer: "Blacksmith Joey",
+    description: "A lump of coal. Essential fuel for smelting and forging."
   }
 ];

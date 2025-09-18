@@ -12,10 +12,15 @@
     .hud {
       display: flex;
       align-items: center;
-      gap: 15px;
+      justify-content: space-between;
       background: #1c1c1c;
       padding: 10px 15px;
       border-bottom: 2px solid #333;
+    }
+    .hud-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
     .hud img#pfp {
       width: 60px; height: 60px;
@@ -29,6 +34,25 @@
       display: flex; align-items: center; gap: 6px;
     }
     .hud-info .currency img { width:20px; height:20px; }
+
+    .hud-right {
+      display: flex;
+      gap: 20px;
+      font-weight: bold;
+    }
+    .hud-right span { font-size: 0.95em; }
+    .hud-right img { width:18px; vertical-align: middle; margin-right:4px; }
+
+    /* Pickaxe indicator */
+    #pickaxeEquipped {
+      margin-left:20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap:5px;
+      color:#87ceeb;
+    }
+    #pickaxeEquipped img { width:22px; height:22px; object-fit:contain; }
 
     /* Buffs Bar */
     .buffs-bar {
@@ -83,6 +107,9 @@
       padding:8px; border:none; border-radius:6px; cursor:pointer;
     }
     .btn-start:hover { background:#00cc00; }
+    .btn-start:disabled {
+      background:#555; cursor:not-allowed;
+    }
 
     /* Back Button */
     .back-btn {
@@ -132,10 +159,17 @@
 <body>
   <!-- HUD -->
   <div class="hud">
-    <img id="pfp" src="images/agent.png" alt="Profile Picture">
-    <div class="hud-info">
-      <h2 id="playerName"></h2>
-      <div class="currency"><img src="images/money.png"><span id="money">0</span></div>
+    <div class="hud-left">
+      <img id="pfp" src="images/agent.png" alt="Profile Picture">
+      <div class="hud-info">
+        <h2 id="playerName"></h2>
+        <div class="currency"><img src="images/money.png"><span id="money">0</span></div>
+      </div>
+      <div id="pickaxeEquipped"></div>
+    </div>
+    <div class="hud-right">
+      <div><img src="images/health.png"> <span id="hudHealth">0 / 0</span></div>
+      <div><img src="images/mana.png"> <span id="hudMana">0 / 0</span></div>
     </div>
   </div>
 
@@ -162,7 +196,13 @@
   <script>
     let player;
 
-    // Dungeons (expandable)
+    // 🔨 Local image resolver so dungeon can show equipped tools/resources
+    function getItemIcon(itemName){
+      if (!itemName) return "images/item.png"; // fallback
+      const fileName = itemName.toLowerCase().replace(/\s+/g,"-") + ".png";
+      return "images/" + fileName;
+    }
+
     const DUNGEONS = [
       { id:"spider-dungeon", name:"Spider Dungeon", level:10, armor:45 }
     ];
@@ -178,6 +218,7 @@
       document.getElementById("playerName").innerText = player.username;
       document.getElementById("pfp").src = player.pfp || "images/agent.png";
       document.getElementById("money").innerText = player.money?.toLocaleString() || 0;
+      updateHUD();
       updateBuffsDisplay();
       renderDungeons();
     }
@@ -188,6 +229,27 @@
       }
     }
 
+    function updateHUD(){
+      document.getElementById("hudHealth").innerText = `${player.stats.health} / ${player.stats.maxHealth}`;
+      document.getElementById("hudMana").innerText   = `${player.stats.mana} / ${player.stats.maxMana}`;
+      const pickDiv = document.getElementById("pickaxeEquipped");
+      const pickaxe = getEquippedPickaxe();
+      if(pickaxe){
+        pickDiv.innerHTML = `<img src="${getItemIcon(pickaxe)}" alt="${pickaxe}"> ${pickaxe}`;
+      } else {
+        pickDiv.innerHTML = "";
+      }
+    }
+
+    function getEquippedPickaxe(){
+      if(!player.inventory) return null;
+      const equipped = player.inventory.find(i=>{
+        const def = ITEMS.find(it=>it.name===i.item);
+        return i.equipped && def && def.slot==="tool" && def.toolType==="pickaxe";
+      });
+      return equipped ? equipped.item : null;
+    }
+
     function updateBuffsDisplay(){
       let buffs=[];
       if(player.stats.armor>0) buffs.push("Armor +" + player.stats.armor);
@@ -195,7 +257,6 @@
       if(player.stats.slashRes>0) buffs.push("SlashRes +" + player.stats.slashRes);
       if(player.stats.magicRes>0) buffs.push("MagicRes +" + player.stats.magicRes);
       if(player.stats.projRes>0) buffs.push("ProjRes +" + player.stats.projRes);
-
       const bar=document.getElementById("buffsBar");
       bar.style.display = buffs.length>0 ? "flex":"none";
       bar.innerText = buffs.join(" | ");
@@ -213,12 +274,16 @@
               <p><b>Requirements:</b> Level ${d.level}</p>
               <p><b>Suggested Armor:</b> ${d.armor}</p>
             </div>
-            <button class="btn btn-start" onclick="startDungeon('${d.id}')">⚔️ Start Dungeon</button>
+            <button class="btn btn-start" ${player.stats.health<=0?"disabled":""} onclick="startDungeon('${d.id}')">⚔️ Start Dungeon</button>
           </div>`;
       });
     }
 
     function startDungeon(dungeonId){
+      if(player.stats.health <= 0){
+        alert("❌ You have 0 health and cannot enter a dungeon! Heal first.");
+        return;
+      }
       const overlay=document.getElementById("dungeonOverlay");
       const bar=document.getElementById("progressInner");
       const result=document.getElementById("resultText");
@@ -244,13 +309,27 @@
       }, 500);
     }
 
+    // === Reward Helper for Resources ===
+    function giveResource(itemName, qty){
+      if(!player.inventory) player.inventory=[];
+      let item = player.inventory.find(i => i.item === itemName);
+      if(item){ item.qty += qty; }
+      else { player.inventory.push({ item: itemName, qty: qty, equipped: false }); }
+      savePlayer();
+    }
+
     function resolveDungeon(id, output, closeBtn, title, resultIcon){
       const d = DUNGEONS.find(x=>x.id===id);
       let log = "";
 
-      // random rewards
       const moneyReward = Math.floor(Math.random() * (500 - 50 + 1)) + 50;
       const xpReward    = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+
+      let resourceDrop = null;
+      const pickaxe = getEquippedPickaxe();
+      if (pickaxe && Math.random() < 0.90) {
+        resourceDrop = { name: "Iron Ore", qty: 1 };
+      }
 
       if(player.level < d.level){
         log = `❌ Must be at least level ${d.level}`;
@@ -262,6 +341,7 @@
         const gap = d.armor - player.stats.armor;
         const dmg = Math.floor(gap * (1+Math.random()));
         player.stats.health = Math.max(0, player.stats.health - dmg);
+        updateHUD();
         if(player.stats.health <= 0){
           log = `💀 Too weak! Dungeon Failed.`;
           player.dungeonsFailed = (player.dungeonsFailed||0)+1;
@@ -270,31 +350,37 @@
           resultIcon.style.display = "block";
         } else {
           log = `⚔️ Low armor (${player.stats.armor}), took ${dmg} damage.\n💰 +${moneyReward} money\n✨ +${xpReward} XP`;
+          if(resourceDrop) log += `\n⛏️ Found: ${resourceDrop.qty}x ${resourceDrop.name}`;
           player.dungeonsDone = (player.dungeonsDone||0)+1;
           player.money += moneyReward; 
           player.totalEarned += moneyReward;
           if (typeof addXP === "function"){ addXP(xpReward); }
           else { player.xp = (player.xp||0) + xpReward; }
+          if(resourceDrop) giveResource(resourceDrop.name, resourceDrop.qty);
           title.innerText = "Victory!! Dungeon successful";
           resultIcon.src = "images/yes.png";
           resultIcon.style.display = "block";
         }
       } else {
         log = `💰 +${moneyReward} money\n✨ +${xpReward} XP`;
+        if(resourceDrop) log += `\n⛏️ Found: ${resourceDrop.qty}x ${resourceDrop.name}`;
         player.dungeonsDone = (player.dungeonsDone||0)+1;
         player.money += moneyReward; 
         player.totalEarned += moneyReward;
         if (typeof addXP === "function"){ addXP(xpReward); }
         else { player.xp = (player.xp||0) + xpReward; }
+        if(resourceDrop) giveResource(resourceDrop.name, resourceDrop.qty);
         title.innerText = "Victory!! Dungeon successful";
         resultIcon.src = "images/yes.png";
         resultIcon.style.display = "block";
       }
 
       savePlayer();
+      updateHUD();
       output.innerText = log;
       document.getElementById("money").innerText = player.money.toLocaleString();
       closeBtn.style.display = "inline-block";
+      renderDungeons(); 
     }
 
     function closeDungeonPopup(){ 

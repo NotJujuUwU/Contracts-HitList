@@ -616,4 +616,42 @@ body {
   color:#555; opacity:0.7; font-style:italic;
 }
 
+/* Override inline styles for bigger resource icons */
+#resourcesSection .resource-card img {
+  width: 82px !important;
+  height: 82px !important;
+}
+
+/* Make text bigger as well */
+#resourcesSection .resource-card .res-name {
+  font-size: 14px !important;
+}
+
+#resourcesSection .resource-card .res-qty {
+  font-size: 12px !important;
+  padding: 2px 7px !important;
+}
+
+/* --- Resource card tighter text stack --- */
+#resourcesSection .resource-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* stack everything toward the top */
+  padding-top: 6px;
+}
+
+#resourcesSection .resource-card img {
+  margin-bottom: 4px; /* little gap below image */
+}
+
+#resourcesSection .resource-card .res-name {
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+#resourcesSection .resource-card .res-qty {
+  margin-top: 2px;
+}
+
                               /*Dungeon Here*/
