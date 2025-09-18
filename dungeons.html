@@ -142,7 +142,7 @@
   <!-- Buffs HUD -->
   <div id="buffsBar" class="buffs-bar"></div>
 
-  <!-- Only Spider Dungeon -->
+  <!-- Dungeon List -->
   <div class="dungeons-row" id="dungeonList"></div>
 
   <!-- Back -->
@@ -162,9 +162,9 @@
   <script>
     let player;
 
-    // Only Spider Dungeon
+    // Dungeons (expandable)
     const DUNGEONS = [
-      { id:"spider-dungeon", name:"Spider Dungeon", level:10, armor:45, reward:200 }
+      { id:"spider-dungeon", name:"Spider Dungeon", level:10, armor:45 }
     ];
 
     function loadPlayer(){
@@ -246,45 +246,60 @@
 
     function resolveDungeon(id, output, closeBtn, title, resultIcon){
       const d = DUNGEONS.find(x=>x.id===id);
-      let log="";
+      let log = "";
+
+      // random rewards
+      const moneyReward = Math.floor(Math.random() * (500 - 50 + 1)) + 50;
+      const xpReward    = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+
       if(player.level < d.level){
-        log=`❌ Must be at least level ${d.level}`;
-        title.innerText="Defeat… Dungeon Failed";
-        resultIcon.src="images/no.png";
-        resultIcon.style.display="block";
+        log = `❌ Must be at least level ${d.level}`;
+        title.innerText = "Defeat… Dungeon Failed";
+        resultIcon.src = "images/no.png";
+        resultIcon.style.display = "block";
+        player.dungeonsFailed = (player.dungeonsFailed||0)+1;
       } else if(player.stats.armor < d.armor){
         const gap = d.armor - player.stats.armor;
         const dmg = Math.floor(gap * (1+Math.random()));
         player.stats.health = Math.max(0, player.stats.health - dmg);
-        if(player.stats.health<=0){
-          log=`💀 Too weak! Dungeon Failed.`;
-          player.dungeonsFailed=(player.dungeonsFailed||0)+1;
-          title.innerText="Defeat… Dungeon Failed";
-          resultIcon.src="images/no.png";
-          resultIcon.style.display="block";
+        if(player.stats.health <= 0){
+          log = `💀 Too weak! Dungeon Failed.`;
+          player.dungeonsFailed = (player.dungeonsFailed||0)+1;
+          title.innerText = "Defeat… Dungeon Failed";
+          resultIcon.src = "images/no.png";
+          resultIcon.style.display = "block";
         } else {
-          log=`⚔️ Low armor (${player.stats.armor}), took ${dmg} damage.\n💰 +${d.reward} gold`;
-          player.dungeonsDone=(player.dungeonsDone||0)+1;
-          player.money+=d.reward; player.totalEarned+=d.reward;
-          title.innerText="Victory!! Dungeon successful";
-          resultIcon.src="images/yes.png";
-          resultIcon.style.display="block";
+          log = `⚔️ Low armor (${player.stats.armor}), took ${dmg} damage.\n💰 +${moneyReward} money\n✨ +${xpReward} XP`;
+          player.dungeonsDone = (player.dungeonsDone||0)+1;
+          player.money += moneyReward; 
+          player.totalEarned += moneyReward;
+          if (typeof addXP === "function"){ addXP(xpReward); }
+          else { player.xp = (player.xp||0) + xpReward; }
+          title.innerText = "Victory!! Dungeon successful";
+          resultIcon.src = "images/yes.png";
+          resultIcon.style.display = "block";
         }
       } else {
-        log=`💰 +${d.reward} gold`;
-        player.dungeonsDone=(player.dungeonsDone||0)+1;
-        player.money+=d.reward; player.totalEarned+=d.reward;
-        title.innerText="Victory!! Dungeon successful";
-        resultIcon.src="images/yes.png";
-        resultIcon.style.display="block";
+        log = `💰 +${moneyReward} money\n✨ +${xpReward} XP`;
+        player.dungeonsDone = (player.dungeonsDone||0)+1;
+        player.money += moneyReward; 
+        player.totalEarned += moneyReward;
+        if (typeof addXP === "function"){ addXP(xpReward); }
+        else { player.xp = (player.xp||0) + xpReward; }
+        title.innerText = "Victory!! Dungeon successful";
+        resultIcon.src = "images/yes.png";
+        resultIcon.style.display = "block";
       }
+
       savePlayer();
-      output.innerText=log;
-      document.getElementById("money").innerText=player.money.toLocaleString();
-      closeBtn.style.display="inline-block";
+      output.innerText = log;
+      document.getElementById("money").innerText = player.money.toLocaleString();
+      closeBtn.style.display = "inline-block";
     }
 
-    function closeDungeonPopup(){ document.getElementById("dungeonOverlay").style.display="none"; }
+    function closeDungeonPopup(){ 
+      document.getElementById("dungeonOverlay").style.display="none"; 
+    }
 
     loadPlayer();
   </script>

@@ -7,9 +7,10 @@ const ITEMS = [
     price: 100,
     type: "consumable",
     icon: "health-potion.png",
-    dealer: "Dr. Bethenie",
+    dealer: "Dr. Bethanie",
     use: () => {
-      heal(50); // calls dashboard.html heal() with cap
+      // heal() returns true if used, false if not used
+      return heal(50);
     }
   },
   {
@@ -18,9 +19,9 @@ const ITEMS = [
     price: 120,
     type: "consumable",
     icon: "mana-potion.png",
-    dealer: "Dr. Bethenie",
+    dealer: "Dr. Bethanie",
     use: () => {
-      restoreMana(50); // calls dashboard.html restoreMana() with cap
+      return restoreMana(50);
     }
   },
 
@@ -29,8 +30,8 @@ const ITEMS = [
     id: "iron-sword",
     name: "Iron Sword",
     price: 500,
-    type: "weapon",
-    slot: "weapon",          // only 1 weapon at a time
+    type: "equipment",
+    slot: "weapon",          
     stats: { damage: 5 },
     icon: "iron-sword.png",
     dealer: "Blacksmith Joey"
@@ -39,7 +40,7 @@ const ITEMS = [
     id: "steel-shield",
     name: "Steel Shield",
     price: 700,
-    type: "armor",
+    type: "equipment",
     slot: "offhand",
     stats: { armor: 8 },
     icon: "steel-shield.png",
@@ -51,7 +52,7 @@ const ITEMS = [
     id: "iron-boots",
     name: "Iron Boots",
     price: 300,
-    type: "armor",
+    type: "equipment",
     slot: "boots",
     stats: { armor: 5 },
     icon: "iron-boots.png",
@@ -61,7 +62,7 @@ const ITEMS = [
     id: "iron-leggings",
     name: "Iron Leggings",
     price: 500,
-    type: "armor",
+    type: "equipment",
     slot: "legs",
     stats: { armor: 10 },
     icon: "iron-leggings.png",
@@ -71,7 +72,7 @@ const ITEMS = [
     id: "iron-chestplate",
     name: "Iron Chestplate",
     price: 800,
-    type: "armor",
+    type: "equipment",
     slot: "chest",
     stats: { armor: 15 },
     icon: "iron-chestplate.png",
@@ -81,7 +82,7 @@ const ITEMS = [
     id: "iron-helmet",
     name: "Iron Helmet",
     price: 400,
-    type: "armor",
+    type: "equipment",
     slot: "head",
     stats: { armor: 7 },
     icon: "iron-helmet.png",

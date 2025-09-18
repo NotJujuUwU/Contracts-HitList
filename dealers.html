@@ -14,12 +14,14 @@
     <main class="store-main">
       <h1>Choose a Dealer</h1>
       <div class="dealer-list">
+        <!-- Dr. Bethanie -->
         <div class="dealer-card" onclick="enterDealer('Dr. Bethanie')">
           <img src="images/dr-bethanie.png" alt="Dr. Bethanie">
           <h2>🧪 Dr. Bethanie</h2>
           <p>Potions and Medical Supplies</p>
         </div>
 
+        <!-- Blacksmith Joey -->
         <div class="dealer-card" onclick="enterDealer('Blacksmith Joey')">
           <img src="images/blacksmith-joey.png" alt="Blacksmith Joey">
           <h2>⚒️ Blacksmith Joey</h2>
@@ -32,7 +34,7 @@
   <script>
     function enterDealer(name){
       localStorage.setItem("currentDealer", name);
-      window.location.href="store.html"; // move to store inventory view
+      window.location.href="npc.html"; // now goes straight into NPC shop
     }
   </script>
 </body>

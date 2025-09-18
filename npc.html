@@ -9,7 +9,8 @@
 <body>
   <div class="store-page">
     <header class="store-header">
-      <button class="btn red" onclick="window.location.href='store.html'">⬅ Back to Dealers</button>
+      <!-- FIXED back button -->
+      <button class="btn red" onclick="window.location.href='dealers.html'">⬅ Back to Dealers</button>
       <div class="profile-mini">
         <div class="pfp-mini"><img id="pfp" src="images/agent.png"></div>
         <span id="playerName"></span> | 
@@ -37,18 +38,17 @@
 
     function formatNumber(num){ return num.toLocaleString(); }
 
-    // ✅ Unified popup system with yes/no images
-    function showPopup(message, type="info", buttons=[]){
-      const overlay = document.getElementById("popupOverlay"),
-            msg = document.getElementById("popupMessage"),
-            btns = document.getElementById("popupButtons");
+    function showPopup(message,type="info",buttons=[]){
+      const overlay=document.getElementById("popupOverlay"),
+            msg=document.getElementById("popupMessage"),
+            btns=document.getElementById("popupButtons");
 
-      let icon = "";
-      if(type==="success") icon = "<img src='images/yes.png' style='width:24px;vertical-align:middle;margin-right:6px'>";
-      if(type==="error")   icon = "<img src='images/no.png' style='width:24px;vertical-align:middle;margin-right:6px'>";
+      let icon="";
+      if(type==="success") icon="<img src='images/yes.png' style='width:24px;vertical-align:middle;margin-right:6px'>";
+      if(type==="error")   icon="<img src='images/no.png' style='width:24px;vertical-align:middle;margin-right:6px'>";
 
-      msg.innerHTML = icon + message;
-      btns.innerHTML = "";
+      msg.innerHTML=icon+message;
+      btns.innerHTML="";
 
       if(buttons.length>0){
         buttons.forEach(b=>{
@@ -72,9 +72,7 @@
       overlay.style.display="flex";
       overlay.className="popup-overlay "+type;
     }
-    function closePopup(){
-      document.getElementById("popupOverlay").style.display="none";
-    }
+    function closePopup(){ document.getElementById("popupOverlay").style.display="none"; }
 
     function loadPlayer(){
       const username=localStorage.getItem("lifeSim_currentUser");
@@ -89,7 +87,7 @@
       document.getElementById("pfp").src=player.pfp;
 
       const dealer=localStorage.getItem("currentDealer");
-      if(!dealer){ window.location.href="store.html"; return; }
+      if(!dealer){ window.location.href="dealers.html"; return; }
       document.getElementById("dealerName").innerText=dealer;
       renderDealerItems(dealer);
     }
@@ -97,7 +95,8 @@
     function renderDealerItems(dealer){
       const container=document.getElementById("dealerItems");
       container.innerHTML="";
-      ITEMS.filter(it=>it.dealer===dealer).forEach(item=>{
+      ITEMS.filter(it=>it.dealer.toLowerCase() === dealer.toLowerCase())
+           .forEach(item=>{
         container.innerHTML+=`
           <div class="item-card">
             <img class="item-pic" src="images/${item.icon}" alt="${item.name}" onerror="this.src='images/item.png';">

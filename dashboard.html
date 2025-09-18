@@ -2,9 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
   <link rel="stylesheet" href="game.css">
   <script src="items.js"></script>
+  <style>
+    /* --- Tabs --- */
+    .inv-tabs {
+      display: flex;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #444;
+    }
+    .inv-tab {
+      flex: 1;
+      padding: 8px;
+      background: #222; /* unified dashboard background */
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 14px;
+    }
+    .inv-tab.active {
+      background: #ffcc00;
+      color: #000;
+      font-weight: bold;
+    }
+
+    /* --- Scrollable Inventory Area --- */
+    .inv-list-container {
+      max-height: 320px;
+      overflow-y: auto;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 5px;
+      background: #222; /* same color as overall dashboard */
+    }
+
+    /* Custom scrollbar styling */
+    .inv-list-container::-webkit-scrollbar {
+      width: 10px;
+    }
+    .inv-list-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #ffcc00, #ff9900);
+      border-radius: 6px;
+    }
+    .inv-list-container::-webkit-scrollbar-track {
+      background: #222;
+    }
+  </style>
 </head>
 <body>
 <div class="dashboard-layout">
@@ -17,7 +63,7 @@
       <input type="file" id="pfpUpload" accept="image/*" style="display:none;" onchange="setPfp(event)">
       <h2 id="playerName"></h2>
       <p>
-        <img class="money-icon" src="images/money.png">
+        <img class="money-icon" src="images/money.png" alt="Money">
         <span id="money"></span>
       </p>
     </div>
@@ -39,7 +85,7 @@
       <p class="player-id">Player ID: <span id="playerID">0000000000</span></p>
       <h1>Player Overview</h1>
       <p><b>Name:</b> <span id="overviewName"></span></p>
-      <p><b>Money:</b> <img class="money-icon" src="images/money.png"> <span id="overviewMoney"></span></p>
+      <p><b>Money:</b> <img class="money-icon" src="images/money.png" alt="Money"> <span id="overviewMoney"></span></p>
       <div class="stats-grid">
         <div class="stat-card"><h3>🏰 Dungeons Done</h3><p id="statDone">0</p></div>
         <div class="stat-card"><h3>💀 Dungeons Failed</h3><p id="statFailed">0</p></div>
@@ -57,17 +103,17 @@
           <h2>Stats</h2>
           <div class="inventory-stats">
             <ul>
-              <li><img src="images/health.png" class="stat-icon"> Health: <span id="statHealth">100 / 100</span></li>
-              <li><img id="mana-icon" src="images/mana.png" class="stat-icon"> Mana: <span id="statMana">100 / 100</span></li>
-              <li><img src="images/armor.png" class="stat-icon"> Armor: <span id="statArmor">0</span></li>
-              <li><img src="images/damage.png" class="stat-icon"> Damage: <span id="statDamage">0</span></li>
-              <li><img src="images/slash-resistance.png" class="stat-icon"> Slash Resistance: <span id="statSlash">0</span></li>
-              <li><img src="images/magic-resistance.png" class="stat-icon"> Magic Resistance: <span id="statMagic">0</span></li>
-              <li><img src="images/projectile-resistance.png" class="stat-icon"> Projectile Resistance: <span id="statProj">0</span></li>
+              <li><img src="images/health.png" class="stat-icon" alt="Health"> Health: <span id="statHealth">100 / 100</span></li>
+              <li><img src="images/mana.png" class="stat-icon" alt="Mana"> Mana: <span id="statMana">100 / 100</span></li>
+              <li><img src="images/armor.png" class="stat-icon" alt="Armor"> Armor: <span id="statArmor">0</span></li>
+              <li><img src="images/damage.png" class="stat-icon" alt="Damage"> Damage: <span id="statDamage">0</span></li>
+              <li><img src="images/slash-resistance.png" class="stat-icon" alt="Slash"> Slash Resistance: <span id="statSlash">0</span></li>
+              <li><img src="images/magic-resistance.png" class="stat-icon" alt="Magic"> Magic Resistance: <span id="statMagic">0</span></li>
+              <li><img src="images/projectile-resistance.png" class="stat-icon" alt="Projectile"> Projectile Resistance: <span id="statProj">0</span></li>
             </ul>
           </div>
           <div class="stat-card">
-            <h3><img src="images/star.png" class="stat-icon align-star"> Level</h3>
+            <h3><img src="images/star.png" class="stat-icon align-star" alt="Level"> Level</h3>
             <p id="statLevel">1</p>
             <div id="xpBarOuter"><div id="xpBarInner"></div></div>
             <small><span id="xpDisplay">0 / 100</span> XP</small>
@@ -75,10 +121,22 @@
           <button class="btn gold" style="margin-top:10px" onclick="addXP(500)">⚡ Give 500 XP (Test)</button>
           <button class="btn green" style="margin-top:10px" onclick="addMoney(100)">💰 Give 100 Money (Test)</button>
         </div>
-        <!-- RIGHT: Items -->
+
+        <!-- RIGHT: Tabbed Inventory -->
         <div class="inventory-right">
-          <h2>All Items</h2>
-          <ul id="inventoryList" class="inventory-list"></ul>
+          <h2>Inventory</h2>
+
+          <!-- Tabs -->
+          <div class="inv-tabs">
+            <button class="inv-tab active" onclick="switchInvTab('consumables')">🍎 Consumables</button>
+            <button class="inv-tab" onclick="switchInvTab('equipment')">⚔️ Equipment</button>
+          </div>
+
+          <!-- Scrollable list container -->
+          <div class="inv-list-container">
+            <ul id="consumableList" class="inventory-list"></ul>
+            <ul id="equipmentList" class="inventory-list" style="display:none;"></ul>
+          </div>
         </div>
       </div>
     </div>
@@ -100,7 +158,7 @@
   </div>
 </div>
 
-<div class="version-label">v0.3</div>
+<div class="version-label">v0.37</div>
 
 <script>
   let player;
@@ -156,12 +214,12 @@
   function heal(amount){
     if(player.stats.health >= player.stats.maxHealth){
       showPopup("You are already at full Health!", "info");
-      return false; // signal: not used
+      return false;
     }
     player.stats.health = Math.min(player.stats.health + amount, player.stats.maxHealth);
     savePlayer(); updateStatsUI();
     showPopup(`You recovered ${amount} HP!`, "success");
-    return true; // signal: used
+    return true;
   }
   function restoreMana(amount){
     if(player.stats.mana >= player.stats.maxMana){
@@ -174,7 +232,7 @@
     return true;
   }
 
-  // === UPDATE STATS DISPLAY ===
+  // === UPDATE STATS ===
   function updateStatsUI(){
     document.getElementById("statHealth").innerText = `${player.stats.health} / ${player.stats.maxHealth}`;
     document.getElementById("statMana").innerText   = `${player.stats.mana} / ${player.stats.maxMana}`;
@@ -206,11 +264,7 @@
   function updateStatsFromEquipment(){
     const currentHP = player.stats.health;
     const currentMana = player.stats.mana;
-    player.stats={
-      health:currentHP, maxHealth:100, 
-      mana:currentMana, maxMana:100, 
-      armor:0, slashRes:0, magicRes:0, projRes:0, damage:0
-    };
+    player.stats={health:currentHP, maxHealth:100, mana:currentMana, maxMana:100, armor:0, slashRes:0, magicRes:0, projRes:0, damage:0};
     player.inventory.forEach(it=>{
       if(it.equipped){
         const def=ITEMS.find(d=>d.name===it.item);
@@ -228,10 +282,13 @@
     savePlayer(); updateStatsUI();
   }
 
-  // === INVENTORY RENDER WITH USE OPTION ===
+  // === INVENTORY SPLIT & RENDER ===
   function renderInventory(){
-    let invList=document.getElementById("inventoryList");
-    invList.innerHTML="";
+    const consumableList=document.getElementById("consumableList");
+    const equipmentList=document.getElementById("equipmentList");
+    consumableList.innerHTML="";
+    equipmentList.innerHTML="";
+
     player.inventory.filter(i=>i.qty>0).forEach(i=>{
       let iconPath=getItemIcon(i.item);
       const def=ITEMS.find(it=>it.name===i.item);
@@ -249,13 +306,16 @@
         actionButton = `<button class="btn green" onclick="equipItem('${i.item}')">Equip</button>`;
       }
 
-      invList.innerHTML+=`
+      const row=`
         <li class="inventory-row ${equippedClass}" title="${statsPreview}">
           <span class="inv-qty">${i.qty}</span>
           <img class="item-icon" src="${iconPath}" alt="${i.item}" onerror="this.src='images/item.png';">
           <span class="inv-name">${i.item}</span>
           ${actionButton}
         </li>`;
+
+      if(def?.type==="consumable"){ consumableList.innerHTML+=row; }
+      else { equipmentList.innerHTML+=row; }
     });
   }
 
@@ -264,11 +324,7 @@
     const invItem = player.inventory.find(i => i.item === itemName);
     const def = ITEMS.find(it => it.name === itemName);
     if(!invItem || !def || !def.use) return;
-
-    // call the item’s effect
-    const wasUsed = def.use();
-
-    // only deduct if actually used
+    const wasUsed = def.use();  // must return true/false
     if(wasUsed){
       invItem.qty--;
       if(invItem.qty <= 0){
@@ -287,13 +343,30 @@
     document.getElementById("overviewMoney").innerText = formatNumber(player.money);
   }
 
+  // === SWITCH INV TAB ===
+  function switchInvTab(tab) {
+    const consumableList = document.getElementById("consumableList");
+    const equipmentList = document.getElementById("equipmentList");
+    const tabs = document.querySelectorAll(".inv-tab");
+
+    if(tab === "consumables") {
+      consumableList.style.display = "block";
+      equipmentList.style.display = "none";
+    } else {
+      consumableList.style.display = "none";
+      equipmentList.style.display = "block";
+    }
+
+    tabs.forEach(btn => btn.classList.remove("active"));
+    if(tab === "consumables") { tabs[0].classList.add("active"); }
+    else { tabs[1].classList.add("active"); }
+  }
+
   // === LOAD/SAVE ===
   function loadPlayer(){
     const username=localStorage.getItem("lifeSim_currentUser");
     if(!username){ window.location.href="index.html"; return;}
     player=JSON.parse(localStorage.getItem("lifeSim_"+username))||{};
-
-    // Defaults
     if(!player.inventory) player.inventory=[];
     if(!player.money) player.money=0;
     if(!player.pfp) player.pfp="images/agent.png";
@@ -306,14 +379,9 @@
     if(!player.xp) player.xp=0;
     if(!player.nextLevelXp) player.nextLevelXp=100;
     if(!player.stats){ 
-      player.stats={
-        health:100, maxHealth:100, 
-        mana:100, maxMana:100, 
-        armor:0, slashRes:0, magicRes:0, projRes:0, damage:0
-      }; 
+      player.stats={health:100,maxHealth:100,mana:100,maxMana:100,armor:0,slashRes:0,magicRes:0,projRes:0,damage:0};
     }
     savePlayer();
-
     document.getElementById("playerName").innerText=player.username;
     document.getElementById("money").innerText=formatNumber(player.money);
     document.getElementById("overviewName").innerText=player.username;
@@ -324,7 +392,6 @@
     document.getElementById("statFailed").innerText=formatNumber(player.dungeonsFailed);
     document.getElementById("statEarned").innerText=formatNumber(player.totalEarned);
     document.getElementById("statQuests").innerText=formatNumber(player.questsCompleted);
-
     renderInventory(); updateStatsUI(); updateXPUI();
   }
 
