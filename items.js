@@ -1,12 +1,16 @@
 // items.js
 const ITEMS = [
+  // === Consumables ===
   {
     id: "health-potion",
     name: "Health Potion",
     price: 100,
     type: "consumable",
     icon: "health-potion.png",
-    dealer: "Dr. Bethenie"
+    dealer: "Dr. Bethenie",
+    use: () => {
+      heal(50); // calls dashboard.html heal() with cap
+    }
   },
   {
     id: "mana-potion",
@@ -14,15 +18,20 @@ const ITEMS = [
     price: 120,
     type: "consumable",
     icon: "mana-potion.png",
-    dealer: "Dr. Bethenie"
+    dealer: "Dr. Bethenie",
+    use: () => {
+      restoreMana(50); // calls dashboard.html restoreMana() with cap
+    }
   },
+
+  // === Weapons & Shields ===
   {
     id: "iron-sword",
     name: "Iron Sword",
     price: 500,
     type: "weapon",
-    slot: "weapon",          // ✅ NEW → ensures only one weapon equipped
-    stats: { damage: 5 },    // ✅ NEW → adds +5 damage when equipped
+    slot: "weapon",          // only 1 weapon at a time
+    stats: { damage: 5 },
     icon: "iron-sword.png",
     dealer: "Blacksmith Joey"
   },
@@ -37,7 +46,7 @@ const ITEMS = [
     dealer: "Blacksmith Joey"
   },
 
-  // 🛡 Iron Armor Set
+  // === Iron Armor Set ===
   {
     id: "iron-boots",
     name: "Iron Boots",
