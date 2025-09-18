@@ -130,8 +130,9 @@
             <ul>
               <li><img src="images/health.png" class="stat-icon"> Health:<span id="statHealth">100</span></li>
               <li><img id="mana-icon" src="images/mana.png" class="stat-icon"> Mana:<span id="statMana">100</span></li>
-              <li><img src="images/armor.png" class="stat-icon"> Armor:<span id="statArmor">0</span></li>
-              <li><img src="images/slash-resistance.png" class="stat-icon"> Slash Resistance:<span id="statSlash">0</span></li>
+              <li><img src="images/armor.png" class="stat-icon"> Armor: <span id="statArmor">0</span></li>
+              <li><img src="images/damage.png" class="stat-icon"> Damage: <span id="statDamage">0</span></li> <!-- NEW -->
+              <li><img src="images/slash-resistance.png" class="stat-icon"> Slash Resistance: <span id="statSlash">0</span></li>
               <li><img src="images/magic-resistance.png" class="stat-icon"> Magic Resistance:<span id="statMagic">0</span></li>
               <li><img src="images/projectile-resistance.png" class="stat-icon"> Projectile Resistance:<span id="statProj">0</span></li>
             </ul>
@@ -170,7 +171,7 @@
   </div>
 </div>
 
-<div class="version-label">v0.18</div>
+<div class="version-label">v0.25</div>
 
 <script>
   let player;
@@ -218,13 +219,14 @@
     document.getElementById("xpBarInner").style.width=percent+"%";
   }
   function updateStatsUI(){
-    document.getElementById("statHealth").innerText=player.stats.health;
-    document.getElementById("statMana").innerText=player.stats.mana;
-    document.getElementById("statArmor").innerText=player.stats.armor;
-    document.getElementById("statSlash").innerText=player.stats.slashRes;
-    document.getElementById("statMagic").innerText=player.stats.magicRes;
-    document.getElementById("statProj").innerText=player.stats.projRes;
-  }
+  document.getElementById("statHealth").innerText = player.stats.health;
+  document.getElementById("statMana").innerText   = player.stats.mana;
+  document.getElementById("statArmor").innerText  = player.stats.armor;
+  document.getElementById("statDamage").innerText = player.stats.damage; // ✅ NEW LINE
+  document.getElementById("statSlash").innerText  = player.stats.slashRes;
+  document.getElementById("statMagic").innerText  = player.stats.magicRes;
+  document.getElementById("statProj").innerText   = player.stats.projRes;
+}
 
   // Equip & Unequip
   function equipItem(itemName){
@@ -248,7 +250,7 @@
   }
 
   function updateStatsFromEquipment(){
-    player.stats={health:100,mana:100,armor:0,slashRes:0,magicRes:0,projRes:0};
+    player.stats={health:100,mana:100,armor:0,slashRes:0,magicRes:0,projRes:0,damage:0};
     player.inventory.forEach(it=>{
       if(it.equipped){
         const def=ITEMS.find(d=>d.name===it.item);

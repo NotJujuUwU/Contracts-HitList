@@ -1,8 +1,8 @@
 // items.js
 const ITEMS = [
   {
-    id: "healing-potion",
-    name: "Healing Potion",
+    id: "health-potion",
+    name: "Health Potion",
     price: 100,
     type: "consumable",
     icon: "healing-potion.png",
@@ -21,6 +21,8 @@ const ITEMS = [
     name: "Iron Sword",
     price: 500,
     type: "weapon",
+    slot: "weapon",          // ✅ NEW → ensures only one weapon equipped
+    stats: { damage: 5 },    // ✅ NEW → adds +5 damage when equipped
     icon: "iron-sword.png",
     dealer: "Blacksmith Joey"
   },
