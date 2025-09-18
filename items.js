@@ -5,7 +5,7 @@ const ITEMS = [
     name: "Health Potion",
     price: 100,
     type: "consumable",
-    icon: "healing-potion.png",
+    icon: "health-potion.png",
     dealer: "Dr. Bethenie"
   },
   {
