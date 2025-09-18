@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dungeons</title>
+  <link rel="stylesheet" href="game.css">
+  <script src="items.js"></script>
+  <style>
+    body { background:#121212; color:#eee; margin:0; font-family:"Segoe UI", sans-serif; }
+
+    /* HUD */
+    .hud {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #1c1c1c;
+      padding: 10px 15px;
+      border-bottom: 2px solid #333;
+    }
+    .hud img#pfp {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      border: 2px solid #FFD700;
+      object-fit: cover;
+    }
+    .hud-info h2 { margin:0; font-size:1.2em; color:#FFD700; }
+    .hud-info .currency {
+      margin-top:5px; font-weight: bold;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .hud-info .currency img { width:20px; height:20px; }
+
+    /* Buffs Bar */
+    .buffs-bar {
+      position: absolute;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(28,28,28,0.95);
+      border:1px solid #444;
+      border-radius:8px;
+      padding:6px 12px;
+      display:none;
+      gap:10px;
+      font-size:0.9em;
+      color:#00ccff;
+    }
+
+    /* Dungeon Layout */
+    .dungeons-row {
+      display:flex;
+      gap: 20px;
+      padding: 25px;
+      justify-content: flex-start;
+    }
+    .dungeon-card {
+      width: 300px; height: 460px;
+      background:#1e1e1e; border:1px solid #333; border-radius:10px;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .dungeon-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 12px rgba(255,215,0,0.2);
+    }
+    .dungeon-img {
+      width: 100%;
+      height: 175px;
+      object-fit: cover;
+      border-bottom: 1px solid #444;
+    }
+    .dungeon-info {
+      flex:1; text-align:center;
+      padding:10px;
+      display:flex; flex-direction:column; justify-content:flex-start;
+    }
+    .dungeon-info h1 { margin:6px 0; font-size:1.3em; color:#FFD700; }
+    .dungeon-info p { margin:4px 0; color:#ccc; font-size:0.95em; }
+    .btn-start {
+      background:#009900; color:#fff;
+      width:90%; margin:10px auto 15px auto;
+      padding:8px; border:none; border-radius:6px; cursor:pointer;
+    }
+    .btn-start:hover { background:#00cc00; }
+
+    /* Back Button */
+    .back-btn {
+      position: fixed;
+      left: 15px; bottom: 15px;
+      padding:10px 15px;
+      background:#444; color:#fff;
+      border:none; border-radius:5px; cursor:pointer;
+    }
+    .back-btn:hover { background:#666; }
+
+    /* Popup Overlay */
+    .dungeon-overlay {
+      display:none;
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.7);
+      align-items:center; justify-content:center;
+      z-index:1000;
+    }
+    .dungeon-box {
+      background:#1c1c1c;
+      padding:25px;
+      border-radius:10px;
+      border:2px solid #FFD700;
+      width:380px;
+      text-align:center;
+      color:#eee;
+      box-shadow: 0 0 20px rgba(255,215,0,0.3);
+    }
+    .dungeon-box img#resultIcon {
+      width:64px; height:64px;
+      display:none;
+      margin:0 auto 10px auto;
+    }
+    .progress-bar { width:100%; height:20px; background:#333; border-radius:8px; margin-top:15px; overflow:hidden; }
+    .progress-inner { height:100%; width:0%; background:#00ccff; transition:width 0.2s; }
+    .result-text { margin-top:12px; font-size:1.1em; white-space:pre-wrap; }
+    .btn-close {
+      display: none;
+      margin-top: 15px;
+      background:#b30000; color:white;
+      border:none; border-radius:6px; padding:8px 14px; cursor:pointer;
+    }
+    .btn-close:hover { background:#e60000; }
+  </style>
+</head>
+<body>
+  <!-- HUD -->
+  <div class="hud">
+    <img id="pfp" src="images/agent.png" alt="Profile Picture">
+    <div class="hud-info">
+      <h2 id="playerName"></h2>
+      <div class="currency"><img src="images/money.png"><span id="money">0</span></div>
+    </div>
+  </div>
+
+  <!-- Buffs HUD -->
+  <div id="buffsBar" class="buffs-bar"></div>
+
+  <!-- Only Spider Dungeon -->
+  <div class="dungeons-row" id="dungeonList"></div>
+
+  <!-- Back -->
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">⬅ Back</button>
+
+  <!-- Popup -->
+  <div id="dungeonOverlay" class="dungeon-overlay">
+    <div class="dungeon-box">
+      <img id="resultIcon" src="" alt="Result Icon">
+      <h2 id="dungeonTitle">Exploring Dungeon...</h2>
+      <div class="progress-bar"><div id="progressInner" class="progress-inner"></div></div>
+      <div id="resultText" class="result-text"></div>
+      <button id="closeBtn" class="btn-close" onclick="closeDungeonPopup()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let player;
+
+    // Only Spider Dungeon
+    const DUNGEONS = [
+      { id:"spider-dungeon", name:"Spider Dungeon", level:10, armor:45, reward:200 }
+    ];
+
+    function loadPlayer(){
+      const username = localStorage.getItem("lifeSim_currentUser");
+      if(!username){ window.location.href="index.html"; return; }
+      player = JSON.parse(localStorage.getItem("lifeSim_"+username)) || {};
+      if(!player.stats){
+        player.stats = {health:100,maxHealth:100,mana:100,maxMana:100,
+                        armor:0,slashRes:0,magicRes:0,projRes:0,damage:0};
+      }
+      document.getElementById("playerName").innerText = player.username;
+      document.getElementById("pfp").src = player.pfp || "images/agent.png";
+      document.getElementById("money").innerText = player.money?.toLocaleString() || 0;
+      updateBuffsDisplay();
+      renderDungeons();
+    }
+
+    function savePlayer(){
+      if(player && player.username){
+        localStorage.setItem("lifeSim_"+player.username, JSON.stringify(player));
+      }
+    }
+
+    function updateBuffsDisplay(){
+      let buffs=[];
+      if(player.stats.armor>0) buffs.push("Armor +" + player.stats.armor);
+      if(player.stats.damage>0) buffs.push("Damage +" + player.stats.damage);
+      if(player.stats.slashRes>0) buffs.push("SlashRes +" + player.stats.slashRes);
+      if(player.stats.magicRes>0) buffs.push("MagicRes +" + player.stats.magicRes);
+      if(player.stats.projRes>0) buffs.push("ProjRes +" + player.stats.projRes);
+
+      const bar=document.getElementById("buffsBar");
+      bar.style.display = buffs.length>0 ? "flex":"none";
+      bar.innerText = buffs.join(" | ");
+    }
+
+    function renderDungeons(){
+      const list=document.getElementById("dungeonList");
+      list.innerHTML="";
+      DUNGEONS.forEach(d=>{
+        list.innerHTML+=`
+          <div class="dungeon-card">
+            <img src="images/${d.id}.png" alt="${d.name}" class="dungeon-img">
+            <div class="dungeon-info">
+              <h1>${d.name}</h1>
+              <p><b>Requirements:</b> Level ${d.level}</p>
+              <p><b>Suggested Armor:</b> ${d.armor}</p>
+            </div>
+            <button class="btn btn-start" onclick="startDungeon('${d.id}')">⚔️ Start Dungeon</button>
+          </div>`;
+      });
+    }
+
+    function startDungeon(dungeonId){
+      const overlay=document.getElementById("dungeonOverlay");
+      const bar=document.getElementById("progressInner");
+      const result=document.getElementById("resultText");
+      const closeBtn=document.getElementById("closeBtn");
+      const title=document.getElementById("dungeonTitle");
+      const resultIcon=document.getElementById("resultIcon");
+
+      overlay.style.display="flex";
+      title.innerText="Exploring Dungeon...";
+      bar.style.width="0%";
+      result.innerText="";
+      closeBtn.style.display="none";
+      resultIcon.style.display="none";
+
+      let progress=0;
+      const interval=setInterval(()=>{
+        progress+=5;
+        bar.style.width=progress+"%";
+        if(progress>=100){
+          clearInterval(interval);
+          resolveDungeon(dungeonId, result, closeBtn, title, resultIcon);
+        }
+      }, 500);
+    }
+
+    function resolveDungeon(id, output, closeBtn, title, resultIcon){
+      const d = DUNGEONS.find(x=>x.id===id);
+      let log="";
+      if(player.level < d.level){
+        log=`❌ Must be at least level ${d.level}`;
+        title.innerText="Defeat… Dungeon Failed";
+        resultIcon.src="images/no.png";
+        resultIcon.style.display="block";
+      } else if(player.stats.armor < d.armor){
+        const gap = d.armor - player.stats.armor;
+        const dmg = Math.floor(gap * (1+Math.random()));
+        player.stats.health = Math.max(0, player.stats.health - dmg);
+        if(player.stats.health<=0){
+          log=`💀 Too weak! Dungeon Failed.`;
+          player.dungeonsFailed=(player.dungeonsFailed||0)+1;
+          title.innerText="Defeat… Dungeon Failed";
+          resultIcon.src="images/no.png";
+          resultIcon.style.display="block";
+        } else {
+          log=`⚔️ Low armor (${player.stats.armor}), took ${dmg} damage.\n💰 +${d.reward} gold`;
+          player.dungeonsDone=(player.dungeonsDone||0)+1;
+          player.money+=d.reward; player.totalEarned+=d.reward;
+          title.innerText="Victory!! Dungeon successful";
+          resultIcon.src="images/yes.png";
+          resultIcon.style.display="block";
+        }
+      } else {
+        log=`💰 +${d.reward} gold`;
+        player.dungeonsDone=(player.dungeonsDone||0)+1;
+        player.money+=d.reward; player.totalEarned+=d.reward;
+        title.innerText="Victory!! Dungeon successful";
+        resultIcon.src="images/yes.png";
+        resultIcon.style.display="block";
+      }
+      savePlayer();
+      output.innerText=log;
+      document.getElementById("money").innerText=player.money.toLocaleString();
+      closeBtn.style.display="inline-block";
+    }
+
+    function closeDungeonPopup(){ document.getElementById("dungeonOverlay").style.display="none"; }
+
+    loadPlayer();
+  </script>
+</body>
+</html>
